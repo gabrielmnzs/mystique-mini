@@ -4,6 +4,9 @@ coverage/
 .turbo/
 *.log
 .DS_Store
+.env
+.env.*
+!.env.example
 
 # Local orchestration state
 .slim/deepwork/
