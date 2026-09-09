@@ -75,22 +75,32 @@ export const defaultTheme: Theme = {
   components: {},
 }
 
-const isObject = (value: unknown): value is Record<string, unknown> =>
-  value !== null && typeof value === 'object' && !Array.isArray(value)
+const RESERVED_KEYS = new Set(['__proto__', 'prototype', 'constructor'])
+
+const isPlainObject = (value: unknown): value is Record<string, unknown> => {
+  if (value === null || typeof value !== 'object') return false
+  const prototype = Object.getPrototypeOf(value)
+  return prototype === Object.prototype || prototype === null
+}
 
 function clone<T>(value: T): T {
   if (Array.isArray(value)) return value.map((item) => clone(item)) as T
-  if (isObject(value)) {
-    return Object.fromEntries(Object.entries(value).map(([key, item]) => [key, clone(item)])) as T
+  if (isPlainObject(value)) {
+    const result: Record<string, unknown> = {}
+    for (const [key, item] of Object.entries(value)) {
+      if (!RESERVED_KEYS.has(key)) result[key] = clone(item)
+    }
+    return result as T
   }
   return value
 }
 
 function merge<T>(base: T, override: unknown): T {
   if (override === undefined) return clone(base)
-  if (!isObject(override)) return clone(override) as T
-  const result: Record<string, unknown> = isObject(base) ? clone(base) : {}
+  if (!isPlainObject(override)) return clone(override) as T
+  const result: Record<string, unknown> = isPlainObject(base) ? clone(base) : {}
   for (const [key, value] of Object.entries(override)) {
+    if (RESERVED_KEYS.has(key)) continue
     result[key] = merge(result[key], value)
   }
   return result as T
