@@ -2,6 +2,9 @@ export type Primitive = string | number | boolean | null
 
 export type TokenScale = Record<string | number, unknown> | unknown[]
 export type ColorPalette = Record<string, string>
+export type SystemStyleObject = {
+  [property: string]: Primitive | SystemStyleObject | Array<Primitive | SystemStyleObject> | undefined
+}
 
 export interface Colors {
   transparent: string
@@ -12,13 +15,15 @@ export interface Colors {
   red: ColorPalette
   blue: ColorPalette
   green: ColorPalette
+  purple: ColorPalette
+  yellow: ColorPalette
   [key: string]: unknown
 }
 
 export interface ComponentThemeConfig {
-  baseStyle?: Record<string, unknown>
-  sizes?: Record<string, Record<string, unknown>>
-  variants?: Record<string, Record<string, unknown>>
+  baseStyle?: SystemStyleObject
+  sizes?: Record<string, SystemStyleObject>
+  variants?: Record<string, SystemStyleObject>
   defaultProps?: Record<string, unknown>
 }
 
@@ -49,6 +54,8 @@ const colors = {
   red: { 50: '#fff5f5', 100: '#fed7d7', 200: '#feb2b2', 300: '#fc8181', 400: '#f56565', 500: '#e53e3e', 600: '#c53030', 700: '#9b2c2c', 800: '#822727', 900: '#63171b' },
   blue: { 50: '#ebf8ff', 100: '#bee3f8', 200: '#90cdf4', 300: '#63b3ed', 400: '#4299e1', 500: '#3182ce', 600: '#2b6cb0', 700: '#2c5282', 800: '#2a4365', 900: '#1a365d' },
   green: { 50: '#f0fff4', 100: '#c6f6d5', 200: '#9ae6b4', 300: '#68d391', 400: '#48bb78', 500: '#38a169', 600: '#2f855a', 700: '#276749', 800: '#22543d', 900: '#1c4532' },
+  purple: { 50: '#faf5ff', 100: '#e9d8fd', 200: '#d6bcfa', 300: '#b794f4', 400: '#9f7aea', 500: '#805ad5', 600: '#6b46c1', 700: '#553c9a', 800: '#44337a', 900: '#322659' },
+  yellow: { 50: '#fffff0', 100: '#fefcbf', 200: '#faf089', 300: '#f6e05e', 400: '#ecc94b', 500: '#d69e2e', 600: '#b7791f', 700: '#975a16', 800: '#744210', 900: '#5f370e' },
 }
 
 export const defaultTheme: Theme = {
@@ -71,11 +78,20 @@ export const defaultTheme: Theme = {
 const isObject = (value: unknown): value is Record<string, unknown> =>
   value !== null && typeof value === 'object' && !Array.isArray(value)
 
+function clone<T>(value: T): T {
+  if (Array.isArray(value)) return value.map((item) => clone(item)) as T
+  if (isObject(value)) {
+    return Object.fromEntries(Object.entries(value).map(([key, item]) => [key, clone(item)])) as T
+  }
+  return value
+}
+
 function merge<T>(base: T, override: unknown): T {
-  if (!isObject(base) || !isObject(override)) return (override === undefined ? base : override) as T
-  const result: Record<string, unknown> = { ...base }
+  if (override === undefined) return clone(base)
+  if (!isObject(override)) return clone(override) as T
+  const result: Record<string, unknown> = isObject(base) ? clone(base) : {}
   for (const [key, value] of Object.entries(override)) {
-    result[key] = isObject(result[key]) && isObject(value) ? merge(result[key], value) : value
+    result[key] = merge(result[key], value)
   }
   return result as T
 }
@@ -94,7 +110,7 @@ export function getToken(theme: Theme, scale: string, value: string | number): u
   const path = String(value).split('.')
   let current: unknown = source
   for (const segment of path) {
-    if (current === null || current === undefined || !(segment in Object(current))) return value
+    if (current === null || current === undefined || !Object.prototype.hasOwnProperty.call(Object(current), segment)) return value
     current = (current as Record<string, unknown>)[segment]
   }
   return current === undefined ? value : current
