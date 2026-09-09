@@ -8,7 +8,10 @@ export function resolveResponsive<T>(value: ResponsiveValue<T>, theme: Theme, re
   const add = (key: string, item: T | null | undefined) => { if (item !== null && item !== undefined) result[key] = resolve(item) }
   if (Array.isArray(value)) {
     add('base', value[0])
-    value.slice(1, breakpoints.length + 1).forEach((item, index) => add(`@media screen and (min-width: ${breakpoints[index][1]})`, item))
+    for (const [index, name] of ['sm', 'md', 'lg', 'xl'].entries()) {
+      const width = theme.breakpoints[name]
+      if (width !== undefined) add(`@media screen and (min-width: ${width})`, value[index + 1])
+    }
   } else {
     const objectValue = value as { base?: T; [key: string]: T | null | undefined }
     add('base', objectValue.base)

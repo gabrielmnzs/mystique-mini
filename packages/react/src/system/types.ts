@@ -4,7 +4,6 @@ export type CSSValue = string | number
 export type ResponsiveValue<T> = T | readonly (T | null | undefined)[] | { readonly base?: T | null; readonly [breakpoint: string]: T | null | undefined }
 
 export interface StyleProps {
-  [property: string]: unknown
   m?: ResponsiveValue<CSSValue>; mt?: ResponsiveValue<CSSValue>; mr?: ResponsiveValue<CSSValue>; mb?: ResponsiveValue<CSSValue>; ml?: ResponsiveValue<CSSValue>; mx?: ResponsiveValue<CSSValue>; my?: ResponsiveValue<CSSValue>
   p?: ResponsiveValue<CSSValue>; pt?: ResponsiveValue<CSSValue>; pr?: ResponsiveValue<CSSValue>; pb?: ResponsiveValue<CSSValue>; pl?: ResponsiveValue<CSSValue>; px?: ResponsiveValue<CSSValue>; py?: ResponsiveValue<CSSValue>
   w?: ResponsiveValue<CSSValue>; h?: ResponsiveValue<CSSValue>; minW?: ResponsiveValue<CSSValue>; maxW?: ResponsiveValue<CSSValue>; minH?: ResponsiveValue<CSSValue>; maxH?: ResponsiveValue<CSSValue>; boxSize?: ResponsiveValue<CSSValue>
