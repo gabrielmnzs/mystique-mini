@@ -4,10 +4,12 @@ import { pseudoEntries } from './pseudos'
 import { resolveResponsive } from './responsive'
 import type { CSSValue, MystiqueStyleProps, StyleProps } from './types'
 
+const isScalar = (value: unknown): value is CSSValue => typeof value === 'string' || typeof value === 'number'
+
 const token = (theme: Theme, scale: string | undefined, value: CSSValue): CSSValue => {
   if (!scale) return value
   const resolved = getToken(theme, scale, value)
-  return resolved !== null && typeof resolved === 'object' ? value : resolved as CSSValue
+  return isScalar(resolved) ? resolved : value
 }
 
 const lookupToken = (theme: Theme, scale: string, value: CSSValue): { found: boolean; value: unknown } => {
@@ -25,7 +27,7 @@ function resolveOne(prop: string, value: CSSValue, theme: Theme): CSSValue {
   const config = stylePropConfig[prop] ?? (aliases[prop] ? { property: aliases[prop][0], scale: 'space' } : undefined)
   if (prop === 'w' || prop === 'h' || prop === 'minW' || prop === 'maxW' || prop === 'minH' || prop === 'maxH' || prop === 'boxSize') {
     const sized = lookupToken(theme, 'sizes', value)
-    return (sized.found ? sized.value : getToken(theme, 'space', value)) as CSSValue
+    return sized.found && isScalar(sized.value) ? sized.value : token(theme, 'space', value)
   }
   return token(theme, config?.scale, value)
 }

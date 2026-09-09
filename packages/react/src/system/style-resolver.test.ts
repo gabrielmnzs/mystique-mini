@@ -58,6 +58,16 @@ describe('style resolver', () => {
     expect(resolveStyles({ w: 'auto' }, theme)).toEqual({ width: 'auto' })
   })
 
+  it('ignores non-scalar sizing groups and falls back through space to raw values', () => {
+    const theme = extendTheme({
+      sizes: { grouped: { sm: '24rem' }, list: ['24rem'] },
+      space: { grouped: '1rem' },
+    })
+    expect(resolveStyles({ w: 'grouped', h: 'list', minW: 'missing' }, theme)).toEqual({
+      width: '1rem', height: 'list', minWidth: 'missing',
+    })
+  })
+
   it('limits responsive arrays to base and canonical breakpoints', () => {
     const theme = extendTheme({ breakpoints: { custom: '20em', sm: '30em', md: '48em', lg: '62em', xl: '80em' } })
     expect(resolveStyles({ color: ['base', 'sm', 'md', 'lg', 'xl', 'ignored'] }, theme)).toEqual({
