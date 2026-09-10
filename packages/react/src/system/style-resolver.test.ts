@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { defaultTheme, extendTheme } from '../theme'
-import { resolveStyleLayers, resolveStyles } from './style-resolver'
+import { resolveComponentStyles, resolveStyleLayers, resolveStyles } from './style-resolver'
 
 describe('style resolver', () => {
   it.each([
@@ -100,6 +100,61 @@ describe('style resolver', () => {
     ['lineHeight', 'lineHeights', 'tight', 1.25], ['letterSpacing', 'letterSpacings', 'wide', '0.025em'],
   ])('resolves the %s token scale', (prop, _scale, value, expected) => {
     expect(resolveStyles({ [prop]: value }, defaultTheme)).toEqual({ [prop === 'fontFamily' ? 'fontFamily' : prop]: expected })
+  })
+
+  it('resolves component recipes with strict precedence and filled controls', () => {
+    const theme = extendTheme({ components: {
+      Button: {
+        baseStyle: { color: 'theme', m: 2, _hover: { color: 'theme-hover' } },
+        sizes: { sm: { color: 'size', p: 1 } },
+        variants: { solid: { color: 'variant', px: 3, _hover: { bg: 'white' } } },
+        defaultProps: { recipeSize: 'sm', variant: 'solid', color: 'default', ml: 1 },
+      },
+    } })
+    const result = resolveComponentStyles({
+      theme,
+      component: theme.components.Button,
+      factoryBaseStyle: { color: 'factory', m: 1, _hover: { color: 'factory-hover' } },
+      props: { color: 'local', mx: 4, ml: 5, _hover: { color: 'local-hover' }, customThing: 'kept' } as never,
+    })
+    expect(result.props).toMatchObject({ recipeSize: 'sm', variant: 'solid', customThing: 'kept' })
+    expect(result.styles).toEqual({
+      color: 'local', margin: '0.5rem', marginLeft: '1.25rem', marginRight: '1rem', padding: '0.25rem',
+      paddingLeft: '0.75rem', paddingRight: '0.75rem',
+      '&:hover': { color: 'local-hover', background: '#ffffff' },
+    })
+  })
+
+  it('uses explicit controls over defaults and keeps sibling pseudo/media rules', () => {
+    const theme = extendTheme({ components: {
+      Card: {
+        baseStyle: { color: 'theme', _hover: { color: 'red' }, _focus: { color: 'blue' } },
+        sizes: { lg: { color: 'size' } },
+        variants: { outline: { color: 'variant' } },
+        defaultProps: { recipeSize: 'lg', variant: 'outline' },
+      },
+    } })
+    const result = resolveComponentStyles({
+      theme, component: theme.components.Card,
+      props: { recipeSize: 'missing', variant: 'missing', color: { base: 'local', md: 'local-md' } },
+    })
+    expect(result.props.recipeSize).toBe('missing')
+    expect(result.props.variant).toBe('missing')
+    expect(result.styles).toEqual({ color: 'local', '&:hover': { color: 'red' }, '&:focus, &[data-focus=true]': { color: 'blue' }, '@media screen and (min-width: 48em)': { color: 'local-md' } })
+  })
+
+  it('lets each recipe layer win the same property at its precedence point', () => {
+    const component = {
+      baseStyle: { color: 'theme' },
+      sizes: { sm: { color: 'size' } },
+      variants: { solid: { color: 'variant' } },
+    }
+    const factory = { color: 'factory' }
+    expect(resolveComponentStyles({ theme: defaultTheme, component: {}, factoryBaseStyle: factory }).styles.color).toBe('factory')
+    expect(resolveComponentStyles({ theme: defaultTheme, component, factoryBaseStyle: factory }).styles.color).toBe('theme')
+    expect(resolveComponentStyles({ theme: defaultTheme, component, factoryBaseStyle: factory, props: { recipeSize: 'sm' } }).styles.color).toBe('size')
+    expect(resolveComponentStyles({ theme: defaultTheme, component, factoryBaseStyle: factory, props: { recipeSize: 'sm', variant: 'solid' } }).styles.color).toBe('variant')
+    expect(resolveComponentStyles({ theme: defaultTheme, component, factoryBaseStyle: factory, props: { recipeSize: 'sm', variant: 'solid', color: 'local' } }).styles.color).toBe('local')
   })
 
   it.each([

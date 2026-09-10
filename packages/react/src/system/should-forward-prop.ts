@@ -2,7 +2,7 @@ import isPropValid from '@emotion/is-prop-valid'
 import { isStyleProp } from './style-config'
 import { isPseudoName } from './pseudos'
 
-const controls = new Set(['variant', 'recipeSize', 'htmlSize'])
+const controls = new Set(['as', 'theme', 'variant', 'recipeSize', 'htmlSize'])
 export const isPseudoProp = isPseudoName
 export function shouldForwardProp(name: string, target: unknown): boolean {
   if (controls.has(name) || isStyleProp(name) || isPseudoProp(name)) return false

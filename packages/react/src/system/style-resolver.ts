@@ -1,9 +1,21 @@
-import { getToken, type Theme } from '../theme'
+import { getToken, type ComponentThemeConfig, type RecipeStyleObject, type Theme } from '../theme'
 import { lookupToken as lookupTokenValue } from '../theme/token-lookup'
 import { getStylePropDefinition, isStyleProp } from './style-config'
 import { pseudoEntries } from './pseudos'
 import { resolveResponsive } from './responsive'
 import type { CSSValue, MystiqueStyleProps, StyleProps } from './types'
+
+export interface ComponentStyleResolutionOptions {
+  theme: Theme
+  component: ComponentThemeConfig
+  factoryBaseStyle?: RecipeStyleObject
+  props?: MystiqueStyleProps & Record<string, unknown>
+}
+
+export interface ComponentStyleResolution {
+  props: MystiqueStyleProps & Record<string, unknown>
+  styles: Record<string, unknown>
+}
 
 const isScalar = (value: unknown): value is CSSValue => typeof value === 'string' || typeof value === 'number'
 
@@ -66,4 +78,27 @@ export function resolveStyleLayers(theme: Theme, ...layers: Array<StyleProps | M
   const result: Record<string, unknown> = {}
   for (const layer of layers) if (layer) mergeResolved(result, resolveStyles(layer, theme))
   return result
+}
+
+/** Resolves a component recipe without depending on React or a styling runtime. */
+export function resolveComponentStyles(options: ComponentStyleResolutionOptions): ComponentStyleResolution {
+  const { theme, component, factoryBaseStyle, props = {} } = options
+  const filledProps: Record<string, unknown> = { ...props }
+  for (const [name, value] of Object.entries(component.defaultProps ?? {})) {
+    if (filledProps[name] === undefined) filledProps[name] = value
+  }
+
+  const recipeSize = typeof filledProps.recipeSize === 'string' ? filledProps.recipeSize : undefined
+  const variant = typeof filledProps.variant === 'string' ? filledProps.variant : undefined
+  const layers: Array<StyleProps | MystiqueStyleProps | undefined> = [
+    factoryBaseStyle,
+    component.baseStyle,
+    recipeSize ? component.sizes?.[recipeSize] : undefined,
+    variant ? component.variants?.[variant] : undefined,
+    filledProps as MystiqueStyleProps,
+  ]
+  return {
+    props: filledProps as MystiqueStyleProps & Record<string, unknown>,
+    styles: resolveStyleLayers(theme, ...layers),
+  }
 }

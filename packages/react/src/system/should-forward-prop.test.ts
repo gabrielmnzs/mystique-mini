@@ -10,6 +10,8 @@ describe('prop filtering', () => {
   it('retains arbitrary custom component props but removes system props', () => {
     expect(shouldForwardProp('customThing', () => null)).toBe(true)
     expect(shouldForwardProp('p', () => null)).toBe(false)
+    expect(shouldForwardProp('as', () => null)).toBe(false)
+    expect(shouldForwardProp('theme', () => null)).toBe(false)
   })
 
   it('evaluates the final runtime target', () => {
