@@ -1,7 +1,7 @@
 import { getToken, type ComponentThemeConfig, type RecipeStyleObject, type Theme } from '../theme'
 import { lookupToken as lookupTokenValue } from '../theme/token-lookup'
 import { getStylePropDefinition, isStyleProp } from './style-config'
-import { pseudoEntries } from './pseudos'
+import { isPseudoName, pseudoEntries } from './pseudos'
 import { resolveResponsive } from './responsive'
 import type { CSSValue, MystiqueStyleProps, StyleProps } from './types'
 
@@ -18,6 +18,7 @@ export interface ComponentStyleResolution {
 }
 
 const isScalar = (value: unknown): value is CSSValue => typeof value === 'string' || typeof value === 'number'
+const RESERVED_KEYS = new Set(['__proto__', 'prototype', 'constructor'])
 
 const token = (theme: Theme, scale: string | undefined, value: CSSValue): CSSValue => {
   if (!scale) return value
@@ -85,17 +86,23 @@ export function resolveComponentStyles(options: ComponentStyleResolutionOptions)
   const { theme, component, factoryBaseStyle, props = {} } = options
   const filledProps: Record<string, unknown> = { ...props }
   for (const [name, value] of Object.entries(component.defaultProps ?? {})) {
+    if (RESERVED_KEYS.has(name)) continue
     if (filledProps[name] === undefined) filledProps[name] = value
   }
 
   const recipeSize = typeof filledProps.recipeSize === 'string' ? filledProps.recipeSize : undefined
   const variant = typeof filledProps.variant === 'string' ? filledProps.variant : undefined
+  const defaultStyleProps: StyleProps & MystiqueStyleProps = {}
+  for (const [name, value] of Object.entries(component.defaultProps ?? {})) {
+    if (!RESERVED_KEYS.has(name) && (isStyleProp(name) || isPseudoName(name))) defaultStyleProps[name as keyof MystiqueStyleProps] = value as never
+  }
   const layers: Array<StyleProps | MystiqueStyleProps | undefined> = [
     factoryBaseStyle,
     component.baseStyle,
     recipeSize ? component.sizes?.[recipeSize] : undefined,
     variant ? component.variants?.[variant] : undefined,
-    filledProps as MystiqueStyleProps,
+    defaultStyleProps,
+    props as MystiqueStyleProps,
   ]
   return {
     props: filledProps as MystiqueStyleProps & Record<string, unknown>,

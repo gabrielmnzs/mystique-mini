@@ -73,6 +73,20 @@ describe('theme foundation', () => {
     expect(theme.colors.blue[500]).toBe('custom')
   })
 
+  it('ignores reserved keys in component defaultProps without changing prototypes', () => {
+    const override = JSON.parse(
+      '{"__proto__":{"polluted":"root"},"components":{"Button":{"defaultProps":{"__proto__":{"polluted":"component"},"prototype":"bad","constructor":{"polluted":"bad"},"mx":4}}}}',
+    ) as DeepPartial<Theme>
+    const theme = extendTheme(override)
+    const defaults = theme.components.Button.defaultProps as Record<string, unknown>
+
+    expect(({} as Record<string, unknown>).polluted).toBeUndefined()
+    expect(Object.getPrototypeOf(theme)).toBe(Object.prototype)
+    expect(Object.getPrototypeOf(defaults)).toBe(Object.prototype)
+    expect(Object.keys(defaults)).toEqual(['mx'])
+    expect(defaults.mx).toBe(4)
+  })
+
   it('preserves custom values as atomic references', () => {
     class CustomValue {
       value = 'custom'

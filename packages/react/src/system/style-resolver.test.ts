@@ -143,6 +143,25 @@ describe('style resolver', () => {
     expect(result.styles).toEqual({ color: 'local', '&:hover': { color: 'red' }, '&:focus, &[data-focus=true]': { color: 'blue' }, '@media screen and (min-width: 48em)': { color: 'local-md' } })
   })
 
+  it('applies default style props before explicit local style props', () => {
+    const theme = extendTheme({ components: {
+      Button: {
+        defaultProps: { mx: 4, _hover: { mx: 3 }, color: { md: 'default-md' } },
+      },
+    } })
+    const result = resolveComponentStyles({
+      theme,
+      component: theme.components.Button,
+      props: { ml: 5, _hover: { ml: 6 }, color: { md: 'local-md' } } as never,
+    })
+
+    expect(result.styles).toEqual({
+      marginLeft: '1.25rem', marginRight: '1rem',
+      '&:hover': { marginLeft: '1.5rem', marginRight: '0.75rem' },
+      '@media screen and (min-width: 48em)': { color: 'local-md' },
+    })
+  })
+
   it('lets each recipe layer win the same property at its precedence point', () => {
     const component = {
       baseStyle: { color: 'theme' },

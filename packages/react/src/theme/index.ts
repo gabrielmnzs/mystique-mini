@@ -4,7 +4,7 @@ import type { PseudoProps, StyleProps } from '../system/types'
 export type TokenScale = Record<string | number, unknown> | unknown[]
 export type ColorPalette = Record<string, string>
 export type RecipeStyleObject = StyleProps & PseudoProps
-export type RecipeDefaultProps = Partial<StyleProps> & { variant?: string; recipeSize?: string }
+export type RecipeDefaultProps = Partial<StyleProps & PseudoProps> & { variant?: string; recipeSize?: string }
 
 export interface Colors {
   transparent: string
