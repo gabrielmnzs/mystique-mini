@@ -1,0 +1,5 @@
+{
+  "extends": "./tsconfig.build-declarations.json",
+  "compilerOptions": { "module": "NodeNext", "moduleResolution": "NodeNext" },
+  "include": ["fixtures/built-declarations.cts"]
+}
