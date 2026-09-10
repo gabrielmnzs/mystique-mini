@@ -58,6 +58,10 @@ describe('style resolver', () => {
     expect(resolveStyles({ w: 'auto' }, theme)).toEqual({ width: 'auto' })
   })
 
+  it('keeps dotted values raw after scalar token leaves', () => {
+    expect(resolveStyles({ color: 'white.0', w: 'sm.0' }, defaultTheme)).toEqual({ color: 'white.0', width: 'sm.0' })
+  })
+
   it('ignores non-scalar sizing groups and falls back through space to raw values', () => {
     const theme = extendTheme({
       sizes: { grouped: { sm: '24rem' }, list: ['24rem'] },

@@ -90,6 +90,7 @@ describe('theme foundation', () => {
   it('does not resolve inherited object properties as tokens', () => {
     expect(getToken(defaultTheme, 'colors', 'toString')).toBe('toString')
     expect(getToken(defaultTheme, 'colors', 'constructor')).toBe('constructor')
+    expect(getToken(defaultTheme, 'colors', 'white.0')).toBe('white.0')
   })
 
   it('supports custom breakpoints and component configs', () => {

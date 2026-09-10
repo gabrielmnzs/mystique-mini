@@ -1,3 +1,5 @@
+import { lookupToken } from './token-lookup'
+
 export type Primitive = string | number | boolean | null
 
 export type TokenScale = Record<string | number, unknown> | unknown[]
@@ -117,11 +119,6 @@ export function extendTheme(override: DeepPartial<Theme> = {}): Theme {
 export function getToken(theme: Theme, scale: string, value: string | number): unknown {
   const source = theme[scale]
   if (source === undefined || source === null) return value
-  const path = String(value).split('.')
-  let current: unknown = source
-  for (const segment of path) {
-    if (current === null || current === undefined || !Object.prototype.hasOwnProperty.call(Object(current), segment)) return value
-    current = (current as Record<string, unknown>)[segment]
-  }
-  return current === undefined ? value : current
+  const result = lookupToken(source, value)
+  return result.found ? result.value : value
 }

@@ -1,6 +1,8 @@
-import type { CSSValue } from './types'
+import type { CSSValue, StyleProps } from './types'
 
-export const stylePropConfig: Record<string, { property: string; scale?: string }> = {
+type StylePropDefinition = { readonly property: string; readonly scale?: string }
+
+export const stylePropConfig: Readonly<Record<keyof StyleProps, StylePropDefinition>> = {
   m: { property: 'margin', scale: 'space' }, mt: { property: 'marginTop', scale: 'space' }, mr: { property: 'marginRight', scale: 'space' }, mb: { property: 'marginBottom', scale: 'space' }, ml: { property: 'marginLeft', scale: 'space' },
   p: { property: 'padding', scale: 'space' }, pt: { property: 'paddingTop', scale: 'space' }, pr: { property: 'paddingRight', scale: 'space' }, pb: { property: 'paddingBottom', scale: 'space' }, pl: { property: 'paddingLeft', scale: 'space' },
   w: { property: 'width', scale: 'sizes' }, h: { property: 'height', scale: 'sizes' }, minW: { property: 'minWidth', scale: 'sizes' }, maxW: { property: 'maxWidth', scale: 'sizes' }, minH: { property: 'minHeight', scale: 'sizes' }, maxH: { property: 'maxHeight', scale: 'sizes' }, boxSize: { property: 'width', scale: 'sizes' },
@@ -10,12 +12,13 @@ export const stylePropConfig: Record<string, { property: string; scale?: string 
   color: { property: 'color', scale: 'colors' }, bg: { property: 'background', scale: 'colors' }, bgColor: { property: 'backgroundColor', scale: 'colors' }, opacity: { property: 'opacity' },
   border: { property: 'border', scale: 'borders' }, borderWidth: { property: 'borderWidth' }, borderStyle: { property: 'borderStyle' }, borderColor: { property: 'borderColor', scale: 'colors' }, rounded: { property: 'borderRadius', scale: 'radii' }, borderRadius: { property: 'borderRadius', scale: 'radii' },
   shadow: { property: 'boxShadow', scale: 'shadows' }, boxShadow: { property: 'boxShadow', scale: 'shadows' }, cursor: { property: 'cursor' }, transform: { property: 'transform' }, transition: { property: 'transition' },
+  mx: { property: 'marginLeft', scale: 'space' }, my: { property: 'marginTop', scale: 'space' }, px: { property: 'paddingLeft', scale: 'space' }, py: { property: 'paddingTop', scale: 'space' },
 }
 
-export const aliases: Record<string, readonly string[]> = {
+export const aliases = {
   mx: ['marginLeft', 'marginRight'], my: ['marginTop', 'marginBottom'], px: ['paddingLeft', 'paddingRight'], py: ['paddingTop', 'paddingBottom'], boxSize: ['width', 'height'],
-}
+} as const satisfies Partial<Record<keyof StyleProps, readonly string[]>>
 
-export const stylePropNames = new Set([...Object.keys(stylePropConfig), ...Object.keys(aliases)])
+const stylePropNames: ReadonlySet<string> = new Set([...Object.keys(stylePropConfig), ...Object.keys(aliases)])
 export const isStyleProp = (name: string): boolean => stylePropNames.has(name)
 export const isCSSValue = (value: unknown): value is CSSValue => typeof value === 'string' || typeof value === 'number'
