@@ -16,8 +16,8 @@ export interface MystiqueOptions {
 
 type PropsOf<T extends ElementType> = ComponentPropsWithoutRef<T>
 type IntrinsicElement = keyof React.JSX.IntrinsicElements
-type TargetProps<T extends ElementType> = MystiqueStyleProps & Omit<PropsOf<T>, keyof MystiqueStyleProps | (T extends IntrinsicElement ? 'size' : never)> & { htmlSize?: number | string }
-export type PolymorphicProps<T extends ElementType> = TargetProps<T> & { as?: T; ref?: ComponentPropsWithRef<T>['ref'] }
+type TargetProps<T extends ElementType, OwnProps extends object = object> = MystiqueStyleProps & OwnProps & Omit<PropsOf<T>, keyof MystiqueStyleProps | keyof OwnProps | (T extends IntrinsicElement ? 'size' : never)> & { htmlSize?: number | string }
+export type PolymorphicProps<T extends ElementType, OwnProps extends object = object> = TargetProps<T, OwnProps> & { as?: T; ref?: ComponentPropsWithRef<T>['ref'] }
 
 /**
  * The concrete overload is deliberately last: React's ComponentProps extracts
@@ -25,9 +25,9 @@ export type PolymorphicProps<T extends ElementType> = TargetProps<T> & { as?: T;
  * when an `as` target is supplied, so it cannot widen default props (or ref)
  * to `any`.
  */
-export interface MystiqueComponent<T extends ElementType = ElementType> {
-  <C extends ElementType>(props: TargetProps<C> & { as: C; ref?: ComponentPropsWithRef<C>['ref'] }): ReactElement | null
-  (props: TargetProps<T> & { as?: never; ref?: ComponentPropsWithRef<T>['ref'] }): ReactElement | null
+export interface MystiqueComponent<T extends ElementType = ElementType, OwnProps extends object = object> {
+  <C extends ElementType>(props: TargetProps<C, OwnProps> & { as: C; ref?: ComponentPropsWithRef<C>['ref'] }): ReactElement | null
+  (props: TargetProps<T, OwnProps> & { as?: never; ref?: ComponentPropsWithRef<T>['ref'] }): ReactElement | null
 }
 
 export function mystique<T extends ElementType>(component: T, options: MystiqueOptions = {}): MystiqueComponent<T> {
