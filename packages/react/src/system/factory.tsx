@@ -40,7 +40,7 @@ export function mystique<C extends ElementType>(component: C, options: MystiqueO
     // The final target, rather than the factory target, performs DOM filtering.
     shouldForwardProp: () => true,
   })((props: RuntimeProps) => {
-    const theme = props.theme ?? defaultTheme
+    const theme = props.theme?.breakpoints ? props.theme : defaultTheme
     const componentTheme = options.themeKey ? theme.components[options.themeKey] ?? {} : {}
     return resolveComponentStyles({ theme, component: componentTheme, factoryBaseStyle: options.baseStyle, props }).styles as CSSObject
   })
