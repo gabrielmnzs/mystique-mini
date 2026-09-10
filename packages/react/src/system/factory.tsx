@@ -14,8 +14,19 @@ export interface MystiqueOptions {
 }
 
 type PropsOf<T extends ElementType> = ComponentPropsWithoutRef<T>
-export type PolymorphicProps<T extends ElementType> = MystiqueStyleProps & Omit<PropsOf<T>, keyof MystiqueStyleProps | 'size'> & { as?: T; htmlSize?: number | string }
-export type MystiqueComponent<T extends ElementType = ElementType> = <E extends ElementType = T>(props: PolymorphicProps<E> & { ref?: ComponentPropsWithRef<E>['ref'] }) => ReactElement | null
+type TargetProps<T extends ElementType> = MystiqueStyleProps & Omit<PropsOf<T>, keyof MystiqueStyleProps | 'size'> & { htmlSize?: number | string }
+export type PolymorphicProps<T extends ElementType> = TargetProps<T> & { as?: T; ref?: ComponentPropsWithRef<T>['ref'] }
+
+/**
+ * The concrete overload is deliberately last: React's ComponentProps extracts
+ * it as the default-target contract. The generic overload is only selected
+ * when an `as` target is supplied, so it cannot widen default props (or ref)
+ * to `any`.
+ */
+export interface MystiqueComponent<T extends ElementType = ElementType> {
+  <C extends ElementType>(props: TargetProps<C> & { as: C; ref?: ComponentPropsWithRef<C>['ref'] }): ReactElement | null
+  (props: TargetProps<T> & { as?: never; ref?: ComponentPropsWithRef<T>['ref'] }): ReactElement | null
+}
 
 export function mystique<T extends ElementType>(component: T, options: MystiqueOptions = {}): MystiqueComponent<T> {
   // The assertion is contained at the React 19 forwardRef boundary; the public callable remains polymorphic.

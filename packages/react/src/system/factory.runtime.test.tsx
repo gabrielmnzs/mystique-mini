@@ -86,13 +86,27 @@ describe('mystique runtime', () => {
 
   it('supports reset defaults, opt-out, and cleanup', () => {
     const { unmount } = render(<MystiqueProvider><span>reset</span></MystiqueProvider>)
-    const resetCSS = () => Array.from(document.head.querySelectorAll('style[data-emotion^="css-global"]')).map((style) => style.textContent ?? '').join('')
-    expect(resetCSS()).toContain('box-sizing:border-box')
-    expect(resetCSS()).toContain('body{margin:0;font-family:system-ui,sans-serif;color:#1a202c;background-color:#ffffff;}')
-    expect(resetCSS()).toContain('font:inherit;color:inherit')
-    expect(resetCSS()).toContain('display:block;max-width:100%')
+    const resetRules = () => Array.from(document.head.querySelectorAll('style[data-emotion^="css-global"]')).flatMap((style) => Array.from(style.sheet?.cssRules ?? []))
+    const ruleFor = (selector: string) => {
+      const rule = resetRules().find((candidate) => 'selectorText' in candidate && candidate.selectorText === selector)
+      expect(rule, `missing reset rule for ${selector}`).toBeDefined()
+      return rule as CSSStyleRule
+    }
+    expect(ruleFor('*, *::before, *::after').style.boxSizing).toBe('border-box')
+    expect(ruleFor('html').style.lineHeight).toBe('1.5')
+    const body = ruleFor('body')
+    expect(body.style.margin).toBe('0px')
+    expect(body.style.fontFamily).toBe('system-ui, sans-serif')
+    expect(body.style.color).toBe('#1a202c')
+    expect(body.style.backgroundColor).toBe('#ffffff')
+    const form = ruleFor('body, button, input, textarea, select')
+    expect(form.style.font).toBe('inherit')
+    expect(form.style.color).toBe('inherit')
+    const media = ruleFor('img, svg, video, canvas, audio, iframe, embed, object')
+    expect(media.style.display).toBe('block')
+    expect(media.style.maxWidth).toBe('100%')
     unmount()
-    expect(resetCSS()).not.toContain('box-sizing:border-box')
+    expect(document.head.querySelectorAll('style[data-emotion^="css-global"]').length).toBe(0)
     const before = document.head.querySelectorAll('style[data-emotion^="css-global"]').length
     render(<MystiqueProvider resetCSS={false}><span>no reset</span></MystiqueProvider>)
     expect(document.head.querySelectorAll('style[data-emotion^="css-global"]').length).toBe(before)
