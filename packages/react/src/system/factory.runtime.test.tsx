@@ -1,7 +1,7 @@
-import { render, screen } from '@testing-library/react'
+import { fireEvent, render, screen } from '@testing-library/react'
 import { forwardRef } from 'react'
 import type React from 'react'
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 /// <reference types="@testing-library/jest-dom" />
 import { mystique, MystiqueProvider, useMystiqueTheme } from '../index'
 import { extendTheme } from '../theme'
@@ -27,21 +27,29 @@ describe('mystique runtime', () => {
 
   it('uses exact recipe precedence and responsive/pseudo styles', () => {
     const theme = extendTheme({ components: { Button: { baseStyle: { color: 'red.500' }, sizes: { sm: { color: 'blue.500' } }, variants: { solid: { color: 'green.500' } } } } })
-    const Button = mystique('button', { name: 'Button', baseStyle: { color: 'black' } })
+    const Button = mystique('button', { themeKey: 'Button', baseStyle: { color: 'black' } })
     render(<MystiqueProvider theme={theme}><Button data-testid="button" recipeSize="sm" variant="solid" color="purple.500" m={{ base: 1, md: 2 }} _hover={{ color: 'yellow.500' }}>go</Button></MystiqueProvider>)
     const button = screen.getByTestId('button')
     expect(button).toHaveStyle({ color: '#805ad5', margin: '0.25rem' })
-    expect(document.head.innerHTML).toContain('hover')
-    expect(document.head.innerHTML).toContain('min-width: 48em')
+    // @ts-expect-error Emotion's matcher is installed at runtime by the Vitest setup.
+    expect(button).toHaveStyleRule('color', '#d69e2e', { target: ':hover' })
+    // @ts-expect-error Emotion's matcher is installed at runtime by the Vitest setup.
+    expect(button).toHaveStyleRule('margin', '0.5rem', { media: '(min-width: 48em)' })
   })
 
   it('uses runtime as as the final target and forwards required custom props', () => {
-    const Required = forwardRef<HTMLDivElement, { required: string; children?: React.ReactNode }>(({ required, ...props }, ref) => <div ref={ref} data-required={required} {...props} />)
+    const Required = forwardRef<HTMLDivElement, { required: string; children?: React.ReactNode; onClick?: () => void }>(({ required, ...props }, ref) => <div ref={ref} data-required={required} {...props} />)
     const Component = mystique(Required)
     const ref = { current: null as HTMLDivElement | null }
-    render(<Component ref={ref} required="yes" data-testid="custom" color="red.500" />)
+    const onClick = vi.fn()
+    render(<Component ref={ref} required="yes" data-testid="custom" color="red.500" data-state="ready" onClick={onClick} />)
     expect(ref.current).toBe(screen.getByTestId('custom'))
     expect(screen.getByTestId('custom')).toHaveAttribute('data-required', 'yes')
+    expect(screen.getByTestId('custom')).toHaveAttribute('data-state', 'ready')
+    expect(screen.getByTestId('custom').className).toMatch(/\bcss-/)
+    expect(screen.getByTestId('custom')).toHaveStyle({ color: '#e53e3e' })
+    fireEvent.click(screen.getByTestId('custom'))
+    expect(onClick).toHaveBeenCalledOnce()
   })
 
   it('maps htmlSize, forwards standard props, and filters controls', () => {
@@ -55,12 +63,36 @@ describe('mystique runtime', () => {
     expect(input).not.toHaveAttribute('as')
   })
 
+  it('switches from an intrinsic base to a custom target', () => {
+    const Required = forwardRef<HTMLDivElement, { required: string; children?: React.ReactNode }>(({ required, ...props }, ref) => <div ref={ref} data-required={required} {...props} />)
+    const Component = mystique('div')
+    render(<Component as={Required} required="yes" data-testid="dynamic" color="red.500" variant="solid" recipeSize="sm" />)
+    expect(screen.getByTestId('dynamic')).toHaveAttribute('data-required', 'yes')
+    expect(screen.getByTestId('dynamic')).not.toHaveAttribute('as')
+    expect(screen.getByTestId('dynamic')).not.toHaveAttribute('variant')
+    expect(screen.getByTestId('dynamic')).not.toHaveAttribute('recipeSize')
+  })
+
+  it('switches from a custom base to an intrinsic target and filters custom props', () => {
+    const Required = forwardRef<HTMLDivElement, { required: string; customOnly?: string }>(({ required, customOnly, ...props }, ref) => <div ref={ref} data-required={required} data-custom-only={customOnly} {...props} />)
+    const Component = mystique(Required)
+    render(<Component as="div" data-testid="dynamic-intrinsic" {...({ required: 'should-not-leak', customOnly: 'should-not-leak' } as Record<string, string>)} color="red.500" variant="solid" recipeSize="sm" />)
+    const dynamic = screen.getByTestId('dynamic-intrinsic')
+    expect(dynamic).not.toHaveAttribute('data-custom-only')
+    expect(dynamic).toHaveAttribute('required')
+    expect(dynamic).not.toHaveAttribute('variant')
+    expect(dynamic).not.toHaveAttribute('recipeSize')
+  })
+
   it('supports reset defaults, opt-out, and cleanup', () => {
     const { unmount } = render(<MystiqueProvider><span>reset</span></MystiqueProvider>)
-    expect(document.head.innerHTML).toContain('box-sizing')
-    const withReset = document.head.querySelectorAll('style[data-emotion^="css-global"]').length
+    const resetCSS = () => Array.from(document.head.querySelectorAll('style[data-emotion^="css-global"]')).map((style) => style.textContent ?? '').join('')
+    expect(resetCSS()).toContain('box-sizing:border-box')
+    expect(resetCSS()).toContain('body{margin:0;font-family:system-ui,sans-serif;color:#1a202c;background-color:#ffffff;}')
+    expect(resetCSS()).toContain('font:inherit;color:inherit')
+    expect(resetCSS()).toContain('display:block;max-width:100%')
     unmount()
-    expect(document.head.querySelectorAll('style[data-emotion^="css-global"]').length).toBeLessThanOrEqual(withReset)
+    expect(resetCSS()).not.toContain('box-sizing:border-box')
     const before = document.head.querySelectorAll('style[data-emotion^="css-global"]').length
     render(<MystiqueProvider resetCSS={false}><span>no reset</span></MystiqueProvider>)
     expect(document.head.querySelectorAll('style[data-emotion^="css-global"]').length).toBe(before)

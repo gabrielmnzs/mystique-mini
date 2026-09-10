@@ -14,7 +14,7 @@ export interface MystiqueProviderProps {
 export function MystiqueProvider({ theme, resetCSS = true, children }: MystiqueProviderProps) {
   const parent = useContext(ThemeContext)
   const resolved = theme === undefined ? parent : mergeTheme(parent, theme)
-  return <ThemeContext.Provider value={resolved}><EmotionThemeProvider theme={resolved}>{resetCSS && <Global styles={resetStyles} />}{children}</EmotionThemeProvider></ThemeContext.Provider>
+  return <ThemeContext.Provider value={resolved}><EmotionThemeProvider theme={resolved}>{resetCSS && <Global styles={resetStyles(resolved)} />}{children}</EmotionThemeProvider></ThemeContext.Provider>
 }
 
 export function useMystiqueTheme(): Theme {
