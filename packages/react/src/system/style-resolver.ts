@@ -1,6 +1,6 @@
 import { getToken, type Theme } from '../theme'
 import { lookupToken as lookupTokenValue } from '../theme/token-lookup'
-import { aliases, isStyleProp, stylePropConfig } from './style-config'
+import { getStylePropDefinition, isStyleProp } from './style-config'
 import { pseudoEntries } from './pseudos'
 import { resolveResponsive } from './responsive'
 import type { CSSValue, MystiqueStyleProps, StyleProps } from './types'
@@ -18,7 +18,7 @@ const lookupToken = (theme: Theme, scale: string, value: CSSValue): { found: boo
 }
 
 function resolveOne(prop: string, value: CSSValue, theme: Theme): CSSValue {
-  const config = stylePropConfig[prop as keyof typeof stylePropConfig] ?? (aliases[prop as keyof typeof aliases] ? { property: aliases[prop as keyof typeof aliases][0], scale: 'space' } : undefined)
+  const config = getStylePropDefinition(prop as keyof StyleProps)
   if (prop === 'w' || prop === 'h' || prop === 'minW' || prop === 'maxW' || prop === 'minH' || prop === 'maxH' || prop === 'boxSize') {
     const sized = lookupToken(theme, 'sizes', value)
     return sized.found && isScalar(sized.value) ? sized.value : token(theme, 'space', value)
@@ -30,7 +30,7 @@ export function resolveStyles(props: StyleProps | MystiqueStyleProps, theme: The
   const result: Record<string, unknown> = {}
   for (const [prop, value] of Object.entries(props)) {
     if (!isStyleProp(prop) || value === undefined) continue
-    const targets = aliases[prop as keyof typeof aliases] ?? (prop === 'boxSize' ? aliases.boxSize : [stylePropConfig[prop as keyof typeof stylePropConfig].property])
+    const targets = getStylePropDefinition(prop as keyof StyleProps).targets
     const resolved = resolveResponsive(value as Parameters<typeof resolveResponsive<CSSValue>>[0], theme, (item) => resolveOne(prop, item, theme))
     for (const target of targets) {
       for (const [key, item] of Object.entries(resolved)) {
