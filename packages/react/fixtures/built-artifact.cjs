@@ -1,9 +1,9 @@
 /* global console */
 const React = require('react')
 const { renderToString } = require('react-dom/server')
-const { mystique } = require('..')
+const { Box, Center, Circle, Flex, Span, Square, Text, mystique } = require('..')
 
-const Box = mystique('div')
-const markup = renderToString(React.createElement(Box, { color: 'blue.500' }, 'cjs'))
-if (!markup.includes('cjs') || !markup.includes('css-')) throw new Error(`unexpected CJS render: ${markup}`)
+const components = [Box, Flex, Center, Square, Circle, Span, Text]
+const markup = components.map((Component, index) => renderToString(React.createElement(Component, { color: 'blue.500', key: index }, 'cjs'))).join('')
+if (!markup.includes('cjs') || (markup.match(/css-/g) || []).length < components.length) throw new Error(`unexpected CJS render: ${markup}`)
 console.log('CJS built artifact smoke passed')

@@ -14,4 +14,10 @@ describe('system public API', () => {
     expect(Object.isFrozen(definition.targets)).toBe(true)
     expect(definition.targets).toEqual(['marginLeft', 'marginRight'])
   })
+
+  it('exports every base component from the package source entrypoint', () => {
+    for (const name of ['Box', 'Flex', 'Center', 'Square', 'Circle', 'Span', 'Text']) {
+      expect(publicApi[name as keyof typeof publicApi]).toBeDefined()
+    }
+  })
 })

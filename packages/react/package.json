@@ -32,6 +32,7 @@
     "build": "tsup",
     "smoke:cjs": "node fixtures/built-artifact.cjs",
     "smoke:esm": "node fixtures/built-artifact.mjs",
+    "smoke:declarations": "tsc -p tsconfig.build-declarations.json",
     "dev": "tsup --watch",
     "test": "vitest run",
     "lint": "eslint src",

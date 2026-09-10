@@ -1,4 +1,4 @@
-import { mystique } from '@gabrielmnzs/mystique-react'
+import { Center, Circle, Flex, Span, Square, Text, mystique } from '@gabrielmnzs/mystique-react'
 import { forwardRef, type ComponentProps, type ComponentRef } from 'react'
 
 /* eslint-disable no-undef, react/display-name */
@@ -21,6 +21,18 @@ const valid = <>
   <Custom as="button" type="button" />
   <RequiredButton required="yes" ref={(node) => node?.click()} />
   <Anchor recipeSize="sm" htmlSize={4} />
+  <Flex as="a" href="/flex" ref={(node) => node?.focus()} />
+  <Center as="a" href="/center" ref={(node) => node?.focus()} />
+  <Span as="a" href="/span" ref={(node) => node?.focus()} />
+  <Text as="a" href="/text" ref={(node) => node?.focus()} />
+  <Square as="a" href="/square" ref={(node) => node?.focus()} />
+  <Circle as="a" href="/circle" ref={(node) => node?.focus()} />
+  <Flex as="option" selected ref={(node) => node?.focus()} />
+  <Center as="option" selected ref={(node) => node?.focus()} />
+  <Span as="option" selected ref={(node) => node?.focus()} />
+  <Text as="option" selected ref={(node) => node?.focus()} />
+  <Square as="option" selected ref={(node) => node?.focus()} />
+  <Circle as="option" selected ref={(node) => node?.focus()} />
 </>
 const _anchorProps: ComponentProps<typeof Anchor> = { href: '/ok' }
 const _ref: ComponentRef<typeof Anchor> = document.createElement('a')
@@ -54,8 +66,14 @@ const invalidSelectedCustomRef = <Div as={CustomTarget} customRequired="yes" ref
 const invalidSelectedIntrinsicAttribute = <Custom as="button" href="/no" />
 // @ts-expect-error custom default props are still required when extracting JSX props
 const invalidExtractedCustom: ComponentProps<typeof Custom> = {}
+// @ts-expect-error selected is not valid on the default div target
+const invalidSelected = <Flex selected />
+// @ts-expect-error selected option refs must point to HTMLOptionElement
+const invalidSelectedRef = <Circle as="option" selected ref={document.createElement('a')} />
+// @ts-expect-error unknown props are rejected on every public base component
+const invalidComponentProp = <Text totallyUnknown={true} />
 
-void [invalidHref, invalidOverriddenHref, invalidRequired, invalidRequiredButton, invalidRef, invalidAsRef, invalidCustomRef, invalidSize, invalidStyle, invalidSelectedCustom, invalidSelectedCustomRef, invalidSelectedIntrinsicAttribute, invalidExtractedCustom]
+void [invalidHref, invalidOverriddenHref, invalidRequired, invalidRequiredButton, invalidRef, invalidAsRef, invalidCustomRef, invalidSize, invalidStyle, invalidSelectedCustom, invalidSelectedCustomRef, invalidSelectedIntrinsicAttribute, invalidExtractedCustom, invalidSelected, invalidSelectedRef, invalidComponentProp]
 
 type IsAny<T> = 0 extends (1 & T) ? true : false
 type AssertFalse<T extends false> = T
