@@ -1,4 +1,4 @@
-import type { ComponentThemeConfig, SystemStyleObject, Theme } from '../theme'
+import type { ComponentThemeConfig } from '../theme'
 
 export type CSSValue = string | number
 export type ResponsiveValue<T> = T | readonly (T | null | undefined)[] | { readonly base?: T | null; readonly [breakpoint: string]: T | null | undefined }
@@ -27,11 +27,9 @@ export type MystiqueStyleProps = StyleProps & PseudoProps & {
   variant?: string
   recipeSize?: string
   htmlSize?: number | string
-  theme?: Theme
-  as?: unknown
 }
 
-export type StyleConfig = SystemStyleObject
+export type StyleConfig = StyleProps & PseudoProps
 export type StyleConfigValue = StyleConfig | undefined
 export type ComponentStyleConfig = ComponentThemeConfig
 export interface ResolvedStyle { [property: string]: CSSValue | ResolvedStyle }

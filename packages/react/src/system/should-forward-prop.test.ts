@@ -8,7 +8,13 @@ describe('prop filtering', () => {
     expect(shouldForwardProp('not-a-dom-prop', true)).toBe(false)
   })
   it('retains arbitrary custom component props but removes system props', () => {
-    expect(shouldForwardProp('customThing', false)).toBe(true)
-    expect(shouldForwardProp('p', false)).toBe(false)
+    expect(shouldForwardProp('customThing', () => null)).toBe(true)
+    expect(shouldForwardProp('p', () => null)).toBe(false)
+  })
+
+  it('evaluates the final runtime target', () => {
+    expect(shouldForwardProp('id', 'button')).toBe(true)
+    expect(shouldForwardProp('not-a-dom-prop', 'button')).toBe(false)
+    expect(shouldForwardProp('customThing', class CustomTarget {})).toBe(true)
   })
 })

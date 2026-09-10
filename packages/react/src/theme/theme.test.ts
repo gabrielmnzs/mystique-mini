@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { defaultTheme, extendTheme, getToken, type DeepPartial, type Theme } from './index'
+import { defaultTheme, extendTheme, getToken, mergeTheme, type DeepPartial, type Theme } from './index'
 
 describe('theme foundation', () => {
   it('resolves tokens, dot paths, raw values, and zero', () => {
@@ -96,9 +96,17 @@ describe('theme foundation', () => {
   it('supports custom breakpoints and component configs', () => {
     const theme = extendTheme({
       breakpoints: { tablet: '40em' },
-      components: { Button: { baseStyle: { color: 'red' }, defaultProps: { size: 'sm' } } },
+      components: { Button: { baseStyle: { color: 'red' }, defaultProps: { recipeSize: 'sm' } } },
     })
     expect(theme.breakpoints.tablet).toBe('40em')
-    expect(theme.components.Button?.defaultProps?.size).toBe('sm')
+    expect(theme.components.Button?.defaultProps?.recipeSize).toBe('sm')
+  })
+
+  it('merges a nested theme over its parent without dropping outer branches', () => {
+    const parent = extendTheme({ colors: { brand: { 500: '#abc' } }, components: { Card: { variants: { soft: { color: 'red' } } } } })
+    const child = mergeTheme(parent, { colors: { brand: { 600: '#def' } }, components: { Card: { baseStyle: { p: 2 } } } })
+    expect(child.colors.brand).toEqual({ 500: '#abc', 600: '#def' })
+    expect(child.components.Card).toEqual({ baseStyle: { p: 2 }, variants: { soft: { color: 'red' } } })
+    expect(parent.components.Card).toEqual({ variants: { soft: { color: 'red' } } })
   })
 })

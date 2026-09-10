@@ -1,12 +1,10 @@
 import { lookupToken } from './token-lookup'
-
-export type Primitive = string | number | boolean | null
+import type { PseudoProps, StyleProps } from '../system/types'
 
 export type TokenScale = Record<string | number, unknown> | unknown[]
 export type ColorPalette = Record<string, string>
-export type SystemStyleObject = {
-  [property: string]: Primitive | SystemStyleObject | Array<Primitive | SystemStyleObject> | undefined
-}
+export type RecipeStyleObject = StyleProps & PseudoProps
+export type RecipeDefaultProps = Partial<StyleProps> & { variant?: string; recipeSize?: string }
 
 export interface Colors {
   transparent: string
@@ -23,10 +21,10 @@ export interface Colors {
 }
 
 export interface ComponentThemeConfig {
-  baseStyle?: SystemStyleObject
-  sizes?: Record<string, SystemStyleObject>
-  variants?: Record<string, SystemStyleObject>
-  defaultProps?: Record<string, unknown>
+  baseStyle?: RecipeStyleObject
+  sizes?: Record<string, RecipeStyleObject>
+  variants?: Record<string, RecipeStyleObject>
+  defaultProps?: RecipeDefaultProps
 }
 
 export interface Theme {
@@ -97,13 +95,13 @@ function clone<T>(value: T): T {
   return value
 }
 
-function merge<T>(base: T, override: unknown): T {
+export function mergeTheme<T>(base: T, override: unknown): T {
   if (override === undefined) return clone(base)
   if (!isPlainObject(override)) return clone(override) as T
   const result: Record<string, unknown> = isPlainObject(base) ? clone(base) : {}
   for (const [key, value] of Object.entries(override)) {
     if (RESERVED_KEYS.has(key)) continue
-    result[key] = merge(result[key], value)
+    Object.defineProperty(result, key, { value: mergeTheme(result[key], value), enumerable: true, writable: true, configurable: true })
   }
   return result as T
 }
@@ -113,7 +111,7 @@ export type DeepPartial<T> = {
 }
 
 export function extendTheme(override: DeepPartial<Theme> = {}): Theme {
-  return merge(defaultTheme, override)
+  return mergeTheme(defaultTheme, override)
 }
 
 export function getToken(theme: Theme, scale: string, value: string | number): unknown {

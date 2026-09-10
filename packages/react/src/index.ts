@@ -1,3 +1,6 @@
 export const mystiqueVersion = '0.1.0'
-export * from './theme'
-export * from './system'
+export { defaultTheme, extendTheme, getToken } from './theme'
+export type { DeepPartial, Theme, TokenScale, ColorPalette, Colors, ComponentThemeConfig, RecipeStyleObject, RecipeDefaultProps } from './theme'
+export type { CSSValue, ResponsiveValue, StyleProps, PseudoProps, MystiqueStyleProps, StyleConfig, StyleConfigValue, ComponentStyleConfig } from './system/types'
+export { isCSSValue, isStyleProp } from './system/style-config'
+export { isPseudoProp, shouldForwardProp, filterProps } from './system/should-forward-prop'

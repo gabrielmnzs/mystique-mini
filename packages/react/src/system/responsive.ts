@@ -5,7 +5,12 @@ export function resolveResponsive<T>(value: ResponsiveValue<T>, theme: Theme, re
   if (!Array.isArray(value) && (typeof value !== 'object' || value === null)) return { base: resolve(value as T) }
   const result: Record<string, CSSValue | Record<string, CSSValue>> = {}
   const breakpoints = Object.entries(theme.breakpoints)
-  const add = (key: string, item: T | null | undefined) => { if (item !== null && item !== undefined) result[key] = resolve(item) }
+  const add = (key: string, item: T | null | undefined) => {
+    if (item !== null && item !== undefined) {
+      const resolved = resolve(item)
+      if (typeof resolved === 'string' || typeof resolved === 'number') result[key] = resolved
+    }
+  }
   if (Array.isArray(value)) {
     add('base', value[0])
     for (const [index, name] of ['sm', 'md', 'lg', 'xl'].entries()) {

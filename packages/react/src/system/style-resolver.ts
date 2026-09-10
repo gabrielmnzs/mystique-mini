@@ -29,7 +29,7 @@ function resolveOne(prop: string, value: CSSValue, theme: Theme): CSSValue {
 export function resolveStyles(props: StyleProps | MystiqueStyleProps, theme: Theme): Record<string, unknown> {
   const result: Record<string, unknown> = {}
   for (const [prop, value] of Object.entries(props)) {
-    if (!isStyleProp(prop) || value === undefined) continue
+    if (!isStyleProp(prop) || value === undefined || value === null || typeof value === 'boolean') continue
     const targets = getStylePropDefinition(prop as keyof StyleProps).targets
     const resolved = resolveResponsive(value as Parameters<typeof resolveResponsive<CSSValue>>[0], theme, (item) => resolveOne(prop, item, theme))
     for (const target of targets) {
@@ -45,4 +45,25 @@ export function resolveStyles(props: StyleProps | MystiqueStyleProps, theme: The
   for (const [key, value] of Object.entries(result)) if (!mediaKeys.has(key)) ordered[key] = value
   for (const key of mediaKeys) if (key in result) ordered[key] = result[key]
   return ordered
+}
+
+const isPlainObject = (value: unknown): value is Record<string, unknown> => {
+  if (value === null || typeof value !== 'object') return false
+  const prototype = Object.getPrototypeOf(value)
+  return prototype === Object.prototype || prototype === null
+}
+
+function mergeResolved(target: Record<string, unknown>, source: Record<string, unknown>): void {
+  for (const [key, value] of Object.entries(source)) {
+    if (key === '__proto__' || key === 'constructor' || key === 'prototype') continue
+    if (isPlainObject(target[key]) && isPlainObject(value)) mergeResolved(target[key] as Record<string, unknown>, value)
+    else Object.defineProperty(target, key, { value, enumerable: true, writable: true, configurable: true })
+  }
+}
+
+/** Resolves layers independently so aliases and responsive rules cannot leak across layers. */
+export function resolveStyleLayers(theme: Theme, ...layers: Array<StyleProps | MystiqueStyleProps | undefined>): Record<string, unknown> {
+  const result: Record<string, unknown> = {}
+  for (const layer of layers) if (layer) mergeResolved(result, resolveStyles(layer, theme))
+  return result
 }

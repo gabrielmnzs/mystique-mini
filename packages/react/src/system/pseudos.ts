@@ -2,9 +2,11 @@ import type { Theme } from '../theme'
 import { isStyleProp } from './style-config'
 import type { PseudoProps, StyleProps } from './types'
 
-export const pseudoSelectors: Record<keyof PseudoProps, string> = {
+const pseudoSelectors: Readonly<Record<keyof PseudoProps, string>> = Object.freeze({
   _hover: '&:hover', _focus: '&:focus, &[data-focus=true]', _active: '&:active, &[data-active=true]', _disabled: '&:disabled, &[disabled], &[aria-disabled=true], &[data-disabled=true]', _placeholder: '&::placeholder',
-}
+})
+
+export const isPseudoName = (name: string): boolean => Object.prototype.hasOwnProperty.call(pseudoSelectors, name)
 
 export function pseudoEntries(props: PseudoProps, theme: Theme, resolve: (props: StyleProps, theme: Theme) => Record<string, unknown>) {
   const output: Record<string, unknown> = {}

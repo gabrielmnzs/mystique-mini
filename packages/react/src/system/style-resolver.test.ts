@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { defaultTheme, extendTheme } from '../theme'
-import { resolveStyles } from './style-resolver'
+import { resolveStyleLayers, resolveStyles } from './style-resolver'
 
 describe('style resolver', () => {
   it.each([
@@ -69,6 +69,20 @@ describe('style resolver', () => {
     })
     expect(resolveStyles({ w: 'grouped', h: 'list', minW: 'missing' }, theme)).toEqual({
       width: '1rem', height: 'list', minWidth: 'missing',
+    })
+  })
+
+  it('merges independently resolved layers in order without losing siblings', () => {
+    const theme = extendTheme({ components: { Button: { baseStyle: { color: 'blue' } } } })
+    expect(resolveStyleLayers(theme,
+      { m: 1, _hover: { color: 'red' }, color: 'red' },
+      { m: 2, mx: 3, _hover: { bg: 'white' }, color: 'blue' },
+      { p: 2, _focus: { color: 'green' } },
+      { ml: 4, color: 'green' },
+      { mr: 5, color: 'white' },
+    )).toEqual({
+      margin: '0.5rem', marginLeft: '1rem', marginRight: '1.25rem', padding: '0.5rem', color: '#ffffff',
+      '&:hover': { color: 'red', background: '#ffffff' }, '&:focus, &[data-focus=true]': { color: 'green' },
     })
   })
 
