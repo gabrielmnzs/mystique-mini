@@ -6,7 +6,7 @@ import { describe, expect, it, vi } from 'vitest'
 import { mystique, MystiqueProvider, useMystiqueTheme } from '../index'
 import { extendTheme } from '../theme'
 
-/* eslint-disable no-undef, react/display-name */
+/* eslint-disable react/display-name */
 
 const Box = mystique('div')
 const isStyleRule = (rule: CSSRule): rule is CSSStyleRule => rule.type === CSSRule.STYLE_RULE

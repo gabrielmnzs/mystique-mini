@@ -1,7 +1,7 @@
 import { Center, Circle, Flex, Span, Square, Text, mystique } from '@gabrielmnzs/mystique-react'
 import { forwardRef, type ComponentProps, type ComponentRef } from 'react'
 
-/* eslint-disable no-undef, react/display-name */
+/* eslint-disable react/display-name */
 
 const Anchor = mystique('a')
 const Div = mystique('div')

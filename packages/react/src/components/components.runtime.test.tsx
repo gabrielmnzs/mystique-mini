@@ -4,8 +4,6 @@ import { describe, expect, it } from 'vitest'
 import { extendTheme, MystiqueProvider } from '../index'
 import { Box, Center, Circle, Flex, Span, Square, Text } from './index'
 
-/* eslint-disable no-undef */
-
 describe('base components', () => {
   it('uses the documented default tags and forwards refs for every component', () => {
     const refs = {

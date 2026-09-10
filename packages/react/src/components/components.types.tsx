@@ -1,8 +1,6 @@
 import { createRef } from 'react'
 import { Box, Circle, Square } from './index'
 
-/* eslint-disable no-undef */
-
 const valid = <>
   <Box ref={createRef<HTMLDivElement>()} />
   <Box as="a" href="/ok" ref={createRef<HTMLAnchorElement>()} />
