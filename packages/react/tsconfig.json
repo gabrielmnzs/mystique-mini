@@ -1,5 +1,9 @@
 {
   "extends": "../../tsconfig.json",
   "include": ["src", "fixtures", "vitest.config.ts"],
-  "compilerOptions": { "types": ["vitest/globals"] }
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": { "@gabrielmnzs/mystique-react": ["./src/index.ts"] },
+    "types": ["vitest/globals"]
+  }
 }
