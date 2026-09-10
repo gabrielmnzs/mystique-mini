@@ -4,3 +4,7 @@ export type { DeepPartial, Theme, TokenScale, ColorPalette, Colors, ComponentThe
 export type { CSSValue, ResponsiveValue, StyleProps, PseudoProps, MystiqueStyleProps, StyleConfig, StyleConfigValue, ComponentStyleConfig } from './system/types'
 export { isCSSValue, isStyleProp } from './system/style-config'
 export { isPseudoProp, shouldForwardProp, filterProps } from './system/should-forward-prop'
+export { mystique } from './system/factory'
+export type { MystiqueOptions, MystiqueComponent, PolymorphicProps } from './system/factory'
+export { MystiqueProvider, useMystiqueTheme } from './system/provider'
+export type { MystiqueProviderProps } from './system/provider'
