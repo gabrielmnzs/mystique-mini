@@ -8,6 +8,7 @@ export default defineConfig({
   clean: true,
   external: [
     'react', 'react-dom', 'react/jsx-runtime', 'react/jsx-dev-runtime',
-    '@emotion/react', '@emotion/styled', '@emotion/is-prop-valid',
+    '@emotion/react',
   ],
+  noExternal: ['@emotion/styled', '@emotion/is-prop-valid'],
 })

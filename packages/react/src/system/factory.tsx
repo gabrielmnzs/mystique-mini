@@ -1,7 +1,8 @@
 import styled from '@emotion/styled'
-import { forwardRef, useMemo, type ComponentPropsWithoutRef, type ComponentPropsWithRef, type ElementType, type ReactElement } from 'react'
+import { createElement, forwardRef, type ComponentPropsWithoutRef, type ComponentPropsWithRef, type ElementType, type ReactElement } from 'react'
+import type React from 'react'
 import { useMystiqueTheme } from './provider'
-import { shouldForwardProp } from './should-forward-prop'
+import { filterProps } from './should-forward-prop'
 import { resolveComponentStyles } from './style-resolver'
 import type { RecipeStyleObject, Theme } from '../theme'
 import type { MystiqueStyleProps } from './types'
@@ -14,7 +15,8 @@ export interface MystiqueOptions {
 }
 
 type PropsOf<T extends ElementType> = ComponentPropsWithoutRef<T>
-type TargetProps<T extends ElementType> = MystiqueStyleProps & Omit<PropsOf<T>, keyof MystiqueStyleProps | 'size'> & { htmlSize?: number | string }
+type IntrinsicElement = keyof React.JSX.IntrinsicElements
+type TargetProps<T extends ElementType> = MystiqueStyleProps & Omit<PropsOf<T>, keyof MystiqueStyleProps | (T extends IntrinsicElement ? 'size' : never)> & { htmlSize?: number | string }
 export type PolymorphicProps<T extends ElementType> = TargetProps<T> & { as?: T; ref?: ComponentPropsWithRef<T>['ref'] }
 
 /**
@@ -29,19 +31,25 @@ export interface MystiqueComponent<T extends ElementType = ElementType> {
 }
 
 export function mystique<T extends ElementType>(component: T, options: MystiqueOptions = {}): MystiqueComponent<T> {
+  const InternalRenderer = forwardRef(function InternalRenderer(inputProps: any, ref: any) {
+    const { __mystiqueTarget: target, __mystiqueHtmlSize: htmlSize, __mystiqueTheme: _theme, ...incoming } = inputProps
+    void _theme
+    const props = { ...incoming, ...(htmlSize === undefined || typeof target !== 'string' ? {} : { size: htmlSize }), ref }
+    return createElement(target, filterProps(props, target))
+  })
+  const StyledRenderer = (styled as any)(InternalRenderer, { shouldForwardProp: () => true })((props: Record<string, unknown>) => {
+    const emotionTheme = props.__mystiqueTheme as Theme
+    const themeKey = options.themeKey
+    const resolved = resolveComponentStyles({ theme: emotionTheme, component: themeKey ? (emotionTheme.components[themeKey] ?? {}) : {}, factoryBaseStyle: options.baseStyle, props: props as MystiqueStyleProps & Record<string, unknown> })
+    return resolved.styles
+  })
+
   // The assertion is contained at the React 19 forwardRef boundary; the public callable remains polymorphic.
   const Component = forwardRef(function MystiqueComponent(inputProps: any, ref: any) {
     const { as, htmlSize, ...incoming } = inputProps
     const theme = useMystiqueTheme()
     const finalTarget = (as ?? component) as ElementType
-    const StyledTarget = useMemo(() => (styled as any)(finalTarget, { shouldForwardProp: (prop: string) => shouldForwardProp(prop, finalTarget) })((props: Record<string, unknown>) => {
-      const emotionTheme = props.theme as Theme | undefined
-      const themeKey = options.themeKey
-      const resolved = resolveComponentStyles({ theme: emotionTheme?.breakpoints ? emotionTheme : theme, component: themeKey ? (theme.components[themeKey] ?? {}) : {}, factoryBaseStyle: options.baseStyle, props: props as MystiqueStyleProps & Record<string, unknown> })
-      return resolved.styles
-    }), [finalTarget, theme])
-    const props = { ...incoming, ...(htmlSize === undefined ? {} : { size: htmlSize }), ref }
-    return <StyledTarget {...props} />
+    return <StyledRenderer {...incoming} __mystiqueTarget={finalTarget} __mystiqueHtmlSize={htmlSize} __mystiqueTheme={theme} ref={ref} />
   } as any)
   return Component as unknown as MystiqueComponent<T>
 }

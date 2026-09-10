@@ -84,6 +84,26 @@ describe('mystique runtime', () => {
     expect(dynamic).not.toHaveAttribute('recipeSize')
   })
 
+  it('keeps the rendered node stable when the provider rerenders with the same theme', () => {
+    const theme = extendTheme({ colors: { brand: 'rebeccapurple' } })
+    const { rerender } = render(<MystiqueProvider theme={theme}><Box as="input" aria-label="stable" defaultValue="keep" autoFocus /></MystiqueProvider>)
+    const input = screen.getByLabelText('stable')
+    input.focus()
+    ;(input as HTMLInputElement).setSelectionRange(0, 2)
+    rerender(<MystiqueProvider theme={theme}><Box as="input" aria-label="stable" defaultValue="keep" autoFocus /></MystiqueProvider>)
+    expect(screen.getByLabelText('stable')).toBe(input)
+    expect(screen.getByLabelText('stable')).toHaveValue('keep')
+    expect(document.activeElement).toBe(input)
+  })
+
+  it('keeps semantic size on custom targets and only maps htmlSize for intrinsic targets', () => {
+    const Custom = forwardRef<HTMLDivElement, { size: string; htmlSize?: string }>(({ size, htmlSize, ...props }, ref) => <div ref={ref} data-size={size} data-html-size={htmlSize} {...props} />)
+    const Component = mystique(Custom)
+    render(<Component size="large" htmlSize="not-a-native-size" data-testid="custom-size" />)
+    expect(screen.getByTestId('custom-size')).toHaveAttribute('data-size', 'large')
+    expect(screen.getByTestId('custom-size')).not.toHaveAttribute('data-html-size')
+  })
+
   it('supports reset defaults, opt-out, and cleanup', () => {
     const { unmount } = render(<MystiqueProvider><span>reset</span></MystiqueProvider>)
     const resetRules = (): CSSRule[] => Array.from(document.head.querySelectorAll<HTMLStyleElement>('style[data-emotion^="css-global"]')).flatMap((style) => Array.from(style.sheet?.cssRules ?? []))
@@ -114,5 +134,15 @@ describe('mystique runtime', () => {
     const before = document.head.querySelectorAll('style[data-emotion^="css-global"]').length
     render(<MystiqueProvider resetCSS={false}><span>no reset</span></MystiqueProvider>)
     expect(document.head.querySelectorAll('style[data-emotion^="css-global"]').length).toBe(before)
+  })
+
+  it('emits one outer reset and does not apply the inner theme globally', () => {
+    render(<MystiqueProvider theme={{ colors: { gray: { 800: 'outer' } } }}><MystiqueProvider theme={{ colors: { gray: { 800: 'inner' } } }}><span>nested</span></MystiqueProvider></MystiqueProvider>)
+    const styles = Array.from(document.head.querySelectorAll<HTMLStyleElement>('style[data-emotion^="css-global"]'))
+    const rules = styles.flatMap((style) => Array.from(style.sheet?.cssRules ?? []))
+    const bodyRules = rules.filter((rule): rule is CSSStyleRule => rule.type === CSSRule.STYLE_RULE && rule.selectorText === 'body')
+    expect(bodyRules).toHaveLength(1)
+    expect(bodyRules[0]?.style.color).toBe('outer')
+    expect(rules.some((rule) => rule.cssText.includes('inner'))).toBe(false)
   })
 })
