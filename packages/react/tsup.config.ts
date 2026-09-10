@@ -3,6 +3,7 @@ import { defineConfig } from 'tsup'
 export default defineConfig({
   entry: ['src/index.ts'],
   format: ['esm', 'cjs'],
+  platform: 'neutral',
   dts: true,
   sourcemap: true,
   clean: true,
@@ -10,5 +11,4 @@ export default defineConfig({
     'react', 'react-dom', 'react/jsx-runtime', 'react/jsx-dev-runtime',
     '@emotion/react',
   ],
-  noExternal: ['@emotion/styled', '@emotion/is-prop-valid'],
 })

@@ -9,6 +9,7 @@ import { extendTheme } from '../theme'
 /* eslint-disable no-undef, react/display-name */
 
 const Box = mystique('div')
+const isStyleRule = (rule: CSSRule): rule is CSSStyleRule => rule.type === CSSRule.STYLE_RULE
 
 describe('mystique runtime', () => {
   it('renders with the default theme without a provider', () => {
@@ -108,7 +109,6 @@ describe('mystique runtime', () => {
     const { unmount } = render(<MystiqueProvider><span>reset</span></MystiqueProvider>)
     const resetRules = (): CSSRule[] => Array.from(document.head.querySelectorAll<HTMLStyleElement>('style[data-emotion^="css-global"]')).flatMap((style) => Array.from(style.sheet?.cssRules ?? []))
     const normalizeSelector = (selector: string) => selector.replace(/\s*,\s*/g, ', ').trim()
-    const isStyleRule = (rule: CSSRule): rule is CSSStyleRule => rule.type === CSSRule.STYLE_RULE
     const ruleFor = (selector: string) => {
       const rule = resetRules().find((candidate): candidate is CSSStyleRule => isStyleRule(candidate) && normalizeSelector(candidate.selectorText) === normalizeSelector(selector))
       expect(rule, `missing reset rule for ${selector}`).toBeDefined()
@@ -140,7 +140,7 @@ describe('mystique runtime', () => {
     render(<MystiqueProvider theme={{ colors: { gray: { 800: 'outer' } } }}><MystiqueProvider theme={{ colors: { gray: { 800: 'inner' } } }}><span>nested</span></MystiqueProvider></MystiqueProvider>)
     const styles = Array.from(document.head.querySelectorAll<HTMLStyleElement>('style[data-emotion^="css-global"]'))
     const rules = styles.flatMap((style) => Array.from(style.sheet?.cssRules ?? []))
-    const bodyRules = rules.filter((rule): rule is CSSStyleRule => rule.type === CSSRule.STYLE_RULE && rule.selectorText === 'body')
+    const bodyRules = rules.filter((rule): rule is CSSStyleRule => isStyleRule(rule) && rule.selectorText === 'body')
     expect(bodyRules).toHaveLength(1)
     expect(bodyRules[0]?.style.color).toBe('outer')
     expect(rules.some((rule) => rule.cssText.includes('inner'))).toBe(false)

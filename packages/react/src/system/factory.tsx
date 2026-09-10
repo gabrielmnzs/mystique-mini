@@ -1,6 +1,6 @@
-import styled from '@emotion/styled'
 import { createElement, forwardRef, type ComponentPropsWithoutRef, type ComponentPropsWithRef, type ElementType, type ReactElement } from 'react'
 import type React from 'react'
+import { styled } from './emotion-interop'
 import { useMystiqueTheme } from './provider'
 import { filterProps } from './should-forward-prop'
 import { resolveComponentStyles } from './style-resolver'

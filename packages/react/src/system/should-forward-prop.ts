@@ -1,6 +1,6 @@
-import isPropValid from '@emotion/is-prop-valid'
 import { isStyleProp } from './style-config'
 import { isPseudoName } from './pseudos'
+import { isPropValid } from './emotion-interop'
 
 const controls = new Set(['as', 'theme', 'variant', 'recipeSize', 'htmlSize'])
 export const isPseudoProp = isPseudoName
