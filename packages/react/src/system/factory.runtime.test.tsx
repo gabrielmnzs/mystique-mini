@@ -86,25 +86,29 @@ describe('mystique runtime', () => {
 
   it('supports reset defaults, opt-out, and cleanup', () => {
     const { unmount } = render(<MystiqueProvider><span>reset</span></MystiqueProvider>)
-    const resetRules = () => Array.from(document.head.querySelectorAll('style[data-emotion^="css-global"]')).flatMap((style) => Array.from(style.sheet?.cssRules ?? []))
+    const resetRules = (): CSSRule[] => Array.from(document.head.querySelectorAll<HTMLStyleElement>('style[data-emotion^="css-global"]')).flatMap((style) => Array.from(style.sheet?.cssRules ?? []))
+    const normalizeSelector = (selector: string) => selector.replace(/\s*,\s*/g, ', ').trim()
+    const isStyleRule = (rule: CSSRule): rule is CSSStyleRule => rule.type === CSSRule.STYLE_RULE
     const ruleFor = (selector: string) => {
-      const rule = resetRules().find((candidate) => 'selectorText' in candidate && candidate.selectorText === selector)
+      const rule = resetRules().find((candidate): candidate is CSSStyleRule => isStyleRule(candidate) && normalizeSelector(candidate.selectorText) === normalizeSelector(selector))
       expect(rule, `missing reset rule for ${selector}`).toBeDefined()
-      return rule as CSSStyleRule
+      if (!rule) throw new Error(`missing reset rule for ${selector}`)
+      return rule
     }
-    expect(ruleFor('*, *::before, *::after').style.boxSizing).toBe('border-box')
-    expect(ruleFor('html').style.lineHeight).toBe('1.5')
+    const declaration = (rule: CSSStyleRule, property: string) => rule.style.getPropertyValue(property)
+    expect(declaration(ruleFor('*, *::before, *::after'), 'box-sizing')).toBe('border-box')
+    expect(declaration(ruleFor('html'), 'line-height')).toBe('1.5')
     const body = ruleFor('body')
-    expect(body.style.margin).toBe('0px')
-    expect(body.style.fontFamily).toBe('system-ui, sans-serif')
-    expect(body.style.color).toBe('#1a202c')
-    expect(body.style.backgroundColor).toBe('#ffffff')
+    expect(declaration(body, 'margin')).toBe('0')
+    expect(declaration(body, 'font-family')).toBe('system-ui,sans-serif')
+    expect(declaration(body, 'color')).toBe('#1a202c')
+    expect(declaration(body, 'background-color')).toBe('#ffffff')
     const form = ruleFor('body, button, input, textarea, select')
-    expect(form.style.font).toBe('inherit')
-    expect(form.style.color).toBe('inherit')
+    expect(declaration(form, 'font')).toBe('inherit')
+    expect(declaration(form, 'color')).toBe('inherit')
     const media = ruleFor('img, svg, video, canvas, audio, iframe, embed, object')
-    expect(media.style.display).toBe('block')
-    expect(media.style.maxWidth).toBe('100%')
+    expect(declaration(media, 'display')).toBe('block')
+    expect(declaration(media, 'max-width')).toBe('100%')
     unmount()
     expect(document.head.querySelectorAll('style[data-emotion^="css-global"]').length).toBe(0)
     const before = document.head.querySelectorAll('style[data-emotion^="css-global"]').length
