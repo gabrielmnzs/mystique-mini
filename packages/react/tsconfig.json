@@ -4,6 +4,6 @@
   "compilerOptions": {
     "baseUrl": ".",
     "paths": { "@gabrielmnzs/mystique-react": ["./src/index.ts"] },
-    "types": ["vitest/globals"]
+    "types": ["vitest/globals", "@testing-library/jest-dom"]
   }
 }
