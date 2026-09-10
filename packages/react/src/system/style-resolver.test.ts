@@ -143,7 +143,7 @@ describe('style resolver', () => {
     expect(result.styles).toEqual({ color: 'local', '&:hover': { color: 'red' }, '&:focus, &[data-focus=true]': { color: 'blue' }, '@media screen and (min-width: 48em)': { color: 'local-md' } })
   })
 
-  it('applies default style props before explicit local style props', () => {
+  it('skips default style props when the exact local prop is present', () => {
     const theme = extendTheme({ components: {
       Button: {
         defaultProps: { mx: 4, _hover: { mx: 3 }, color: { md: 'default-md' } },
@@ -152,14 +152,37 @@ describe('style resolver', () => {
     const result = resolveComponentStyles({
       theme,
       component: theme.components.Button,
-      props: { ml: 5, _hover: { ml: 6 }, color: { md: 'local-md' } } as never,
+      props: { ml: 5, _hover: { ml: 6 }, color: { base: 'local', md: 'local-md' } } as never,
     })
 
     expect(result.styles).toEqual({
       marginLeft: '1.25rem', marginRight: '1rem',
-      '&:hover': { marginLeft: '1.5rem', marginRight: '0.75rem' },
-      '@media screen and (min-width: 48em)': { color: 'local-md' },
+      '&:hover': { marginLeft: '1.5rem' },
+      color: 'local', '@media screen and (min-width: 48em)': { color: 'local-md' },
     })
+  })
+
+  it.each([
+    ['base', { mx: 1 }, { m: 2 }, ['marginLeft', 'marginRight', 'margin']],
+    ['pseudo', { _hover: { mx: 1 } }, { _hover: { m: 2 } }, ['marginLeft', 'marginRight', 'margin']],
+    ['media', { mx: { md: 1 } }, { m: { md: 2 } }, ['marginLeft', 'marginRight', 'margin']],
+  ])('serializes later shorthand after earlier %s longhands', (context, earlier, later, keys) => {
+    const styles = resolveStyleLayers(defaultTheme, earlier as never, later as never)
+    const value = context === 'base' ? styles : styles['@media screen and (min-width: 48em)']
+    const nested = context === 'pseudo' ? styles['&:hover'] : value
+    expect(Object.keys(nested as Record<string, unknown>)).toEqual(keys)
+  })
+
+  it('moves an overwritten resolved leaf after its sibling declarations', () => {
+    expect(Object.keys(resolveStyleLayers(defaultTheme, { m: 1, mx: 2 }, { m: 3 }))).toEqual([
+      'marginLeft', 'marginRight', 'margin',
+    ])
+    expect(Object.keys(resolveStyleLayers(defaultTheme, { _hover: { m: 1, mx: 2 } }, { _hover: { m: 3 } })['&:hover'] as Record<string, unknown>)).toEqual([
+      'marginLeft', 'marginRight', 'margin',
+    ])
+    expect(Object.keys((resolveStyleLayers(defaultTheme, { m: { md: 1 }, mx: { md: 2 } }, { m: { md: 3 } })['@media screen and (min-width: 48em)'] as Record<string, unknown>))).toEqual([
+      'marginLeft', 'marginRight', 'margin',
+    ])
   })
 
   it('lets each recipe layer win the same property at its precedence point', () => {

@@ -70,7 +70,10 @@ function mergeResolved(target: Record<string, unknown>, source: Record<string, u
   for (const [key, value] of Object.entries(source)) {
     if (key === '__proto__' || key === 'constructor' || key === 'prototype') continue
     if (isPlainObject(target[key]) && isPlainObject(value)) mergeResolved(target[key] as Record<string, unknown>, value)
-    else Object.defineProperty(target, key, { value, enumerable: true, writable: true, configurable: true })
+    else {
+      delete target[key]
+      Object.defineProperty(target, key, { value, enumerable: true, writable: true, configurable: true })
+    }
   }
 }
 
@@ -94,7 +97,9 @@ export function resolveComponentStyles(options: ComponentStyleResolutionOptions)
   const variant = typeof filledProps.variant === 'string' ? filledProps.variant : undefined
   const defaultStyleProps: StyleProps & MystiqueStyleProps = {}
   for (const [name, value] of Object.entries(component.defaultProps ?? {})) {
-    if (!RESERVED_KEYS.has(name) && (isStyleProp(name) || isPseudoName(name))) defaultStyleProps[name as keyof MystiqueStyleProps] = value as never
+    if (props[name] === undefined && !RESERVED_KEYS.has(name) && (isStyleProp(name) || isPseudoName(name))) {
+      defaultStyleProps[name as keyof MystiqueStyleProps] = value as never
+    }
   }
   const layers: Array<StyleProps | MystiqueStyleProps | undefined> = [
     factoryBaseStyle,
