@@ -37,7 +37,7 @@ h2 { font-size: clamp(3.3rem, 7vw, 6.5rem); }
 .specimen-copy { max-width: 24rem; color: rgb(244 240 232 / .72); font-size: .85rem; line-height: 1.55; }
 .specimen:not(.specimen-wide):not(.specimen-polymorph) { border-color: rgb(21 35 31 / .25); }
 .mini-layout { height: 105px; }
-.mini-block { min-height: 100%; border-radius: 4px; }
+.mini-block { min-height: 0; border-radius: 4px; }
 .shape-stage { height: 145px; }
 .center-demo { width: 4.5rem; height: 4.5rem; border: 1px dashed #496b58; border-radius: 50%; }
 .type-demo { margin: 2.5rem 0 2rem; font: 500 clamp(1.8rem, 4vw, 3rem)/1 'Newsreader', Georgia, serif; letter-spacing: -.04em; }
