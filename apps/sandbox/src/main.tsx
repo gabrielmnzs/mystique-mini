@@ -1,4 +1,4 @@
-import { StrictMode, useState } from 'react'
+import { StrictMode, useEffect, useRef, useState } from 'react'
 import { createRoot } from 'react-dom/client'
 import {
   Box,
@@ -19,12 +19,14 @@ const theme = extendTheme({
     ink: '#15231f',
     paper: '#f4f0e8',
     mist: '#e4ebe3',
-    coral: '#e36d4d',
+    coral: '#9f3d2d',
+    white: '#f4f0e8',
+    gray: { 800: '#15231f' },
     moss: '#496b58',
     lilac: '#ded7ec',
   },
   space: { page: 'clamp(1.25rem, 4vw, 4rem)', section: 'clamp(3rem, 8vw, 7rem)' },
-  fonts: { body: "'Avenir Next', 'Helvetica Neue', sans-serif", heading: "'Iowan Old Style', 'Baskerville', serif", mono: "'SFMono-Regular', Consolas, monospace" },
+  fonts: { body: "'Manrope', sans-serif", heading: "'Newsreader', Georgia, serif", mono: "'DM Mono', monospace" },
   components: {
     Specimen: {
       baseStyle: { rounded: 'md', border: '1px solid', borderColor: 'ink', bg: 'paper', color: 'ink' },
@@ -53,23 +55,50 @@ function SectionLabel({ number, children }: { number: string; children: string }
   return <Flex className="section-label" align="center" gap="0.65rem"><Span className="section-number">{number}</Span><Span>{children}</Span></Flex>
 }
 
-function App() {
-  const [copied, setCopied] = useState(false)
-  const copyInstall = async () => {
-    await navigator.clipboard?.writeText(installCode)
-    setCopied(true)
-    window.setTimeout(() => setCopied(false), 1600)
+export function App() {
+  const [copyState, setCopyState] = useState<'idle' | 'success' | 'error' | 'unavailable'>('idle')
+  const copyTimeout = useRef<number | null>(null)
+  const clearCopyTimeout = () => {
+    if (copyTimeout.current !== null) {
+      window.clearTimeout(copyTimeout.current)
+      copyTimeout.current = null
+    }
   }
+  useEffect(() => () => {
+    if (copyTimeout.current !== null) window.clearTimeout(copyTimeout.current)
+  }, [])
+  const showCopyState = (state: Exclude<typeof copyState, 'idle'>) => {
+    clearCopyTimeout()
+    setCopyState(state)
+    copyTimeout.current = window.setTimeout(() => {
+      copyTimeout.current = null
+      setCopyState('idle')
+    }, 1600)
+  }
+  const copyInstall = async () => {
+    clearCopyTimeout()
+    if (!navigator.clipboard?.writeText) {
+      showCopyState('unavailable')
+      return
+    }
+    try {
+      await navigator.clipboard.writeText(installCode)
+      showCopyState('success')
+    } catch {
+      showCopyState('error')
+    }
+  }
+  const copyLabel = { idle: 'Copy install command', success: 'Copied to clipboard ✓', error: 'Could not copy command', unavailable: 'Clipboard not available' }[copyState]
 
   return (
     <MystiqueProvider theme={theme}>
-      <Box as="main" className="site-shell">
+      <Box className="site-shell">
         <Flex as="header" className="topbar" align="center" justify="space-between">
           <Flex align="center" gap="0.65rem"><Circle className="brand-mark" boxSize="1.6rem" bg="coral" /><Text className="brand-name">mystique <Span color="coral">mini</Span></Text></Flex>
           <Flex as="nav" className="nav-links" gap="1.5rem" aria-label="Primary navigation"><Box as="a" href="#catalog">Catalog</Box><Box as="a" href="#setup">Setup</Box><Box as="a" href="https://github.com/gabrielmnzs/mystique-mini" target="_blank" rel="noreferrer">GitHub ↗</Box></Flex>
         </Flex>
 
-        <Box as="section" className="hero" aria-labelledby="hero-title">
+        <Box as="main"><Box as="section" className="hero" aria-labelledby="hero-title">
           <Flex className="hero-kicker" align="center" gap="0.75rem"><Square boxSize="0.55rem" bg="coral" transform="rotate(45deg)" /><Span>COMPONENT LAB / 01</Span></Flex>
           <Text as="h1" id="hero-title" className="hero-title">A small system<br /><em>with room to play.</em></Text>
           <Flex className="hero-bottom" align="end" justify="space-between" gap="2rem">
@@ -89,17 +118,19 @@ function App() {
             </Specimen>
             <Specimen className="specimen" variant="quiet" recipeSize="sm"><Span className="eyebrow">Center / Square / Circle</Span><Flex className="shape-stage" align="center" justify="center" gap="0.75rem"><Center className="center-demo"><Circle boxSize="2.3rem" bg="coral" /></Center><Square boxSize="3.5rem" bg="ink" rounded="sm" /><Circle boxSize="3.5rem" bg="moss" /></Flex><Text className="caption">Geometry with a point of view.</Text></Specimen>
             <Specimen className="specimen" variant="quiet" recipeSize="sm"><Span className="eyebrow">Text / Span</Span><Text className="type-demo">Make it <Span color="coral">legible.</Span></Text><Text className="caption">Type hierarchy without ceremony.</Text></Specimen>
-            <Specimen className="specimen specimen-polymorph" variant="featured"><Span className="eyebrow">Polymorphic component</Span><Text as="h3">One component,<br /><em>many voices.</em></Text><Flex gap="0.65rem" wrap="wrap" mt="1.5rem"><Box as="button" className="sample-control" _hover={{ bg: 'coral', color: 'ink' }} _active={{ transform: 'translateY(2px)' }}>as button</Box><Box as="a" href="#setup" className="sample-control" _hover={{ bg: 'paper', color: 'ink' }} _focus={{ borderColor: 'coral' }}>as link ↗</Box></Flex></Specimen>
+            <Specimen className="specimen specimen-polymorph" variant="featured"><Span className="eyebrow">Polymorphic component</Span><Text as="h3">One component,<br /><em>many voices.</em></Text><Flex gap="0.65rem" wrap="wrap" mt="1.5rem"><Box as="button" className="sample-control" onClick={() => document.getElementById('setup')?.scrollIntoView()} _hover={{ bg: 'coral', color: 'ink' }} _active={{ transform: 'translateY(2px)' }}>as button → setup</Box><Box as="a" href="#setup" className="sample-control" _hover={{ bg: 'paper', color: 'ink' }} _focus={{ borderColor: 'coral' }}>as link ↗</Box></Flex></Specimen>
           </Box>
         </Box>
 
         <Box as="section" className="recipe-section" aria-labelledby="recipe-title"><SectionLabel number="02">Recipe card</SectionLabel><Flex className="recipe-layout" gap="clamp(2rem, 7vw, 7rem)" align="center"><Box flex="1"><Text as="h2" id="recipe-title">Tokens in,<br /><em>character out.</em></Text><Text className="body-copy">Theme configuration stays close to the surface. Add your palette, shape a component recipe, and let the components carry the rhythm.</Text></Box><Specimen className="recipe-preview"><Span className="eyebrow">Specimen / default</Span><Text as="h3">A custom recipe</Text><Flex align="center" gap="0.75rem" mt="2rem"><Circle boxSize="2.5rem" bg="coral" /><Box><Text fontWeight="bold">Default props in action</Text><Text className="muted">variant: quiet · recipeSize: lg</Text></Box></Flex></Specimen></Flex></Box>
 
-        <Box as="section" id="setup" className="setup-section" aria-labelledby="setup-title"><SectionLabel number="03">Start here</SectionLabel><Flex className="setup-layout" gap="clamp(2rem, 7vw, 7rem)"><Box flex="1"><Text as="h2" id="setup-title">Bring your<br /><em>own atmosphere.</em></Text><Text className="body-copy">For an existing React 19 app. Node 24 and pnpm 11 keep the baseline pleasantly modern.</Text><Text className="reset-note">Provider resetCSS: on by default.</Text><Box as="button" className="copy-install" onClick={copyInstall}>{copied ? 'Copied to clipboard ✓' : 'Copy install command'}<Span>↗</Span></Box></Box><Box flex="1" className="code-column"><Box className="code-block"><Flex justify="space-between" className="code-head"><Span>INSTALL</Span><Span>pnpm 11 · node 24</Span></Flex><Text as="code">{installCode}</Text></Box><Box className="code-block"><Flex justify="space-between" className="code-head"><Span>USAGE</Span><Span>React 19</Span></Flex><Text as="pre">{usageCode}</Text></Box></Box></Flex></Box>
+        <Box as="section" id="setup" className="setup-section" aria-labelledby="setup-title"><SectionLabel number="03">Start here</SectionLabel><Flex className="setup-layout" gap="clamp(2rem, 7vw, 7rem)"><Box flex="1"><Text as="h2" id="setup-title">Bring your<br /><em>own atmosphere.</em></Text><Text className="body-copy">For an existing React 19 app. Node 24 and pnpm 11 keep the baseline pleasantly modern.</Text><Text className="reset-note">Provider resetCSS: on by default.</Text><Box className="install-prerequisite"><strong>Private registry prerequisite</strong><br />@gabrielmnzs:registry=https://npm.pkg.github.com<br /><code>export GITHUB_TOKEN=your-token</code> <span>(requires read:packages)</span>.</Box><Box as="button" className="copy-install" onClick={copyInstall}>{copyLabel}<Span>↗</Span></Box><Text role="status" aria-live="polite" className="copy-status">{copyState === 'idle' ? '' : copyLabel}</Text></Box><Box flex="1" className="code-column"><Box className="code-block"><Flex justify="space-between" className="code-head"><Span>INSTALL</Span><Span>pnpm 11 · node 24</Span></Flex><Text as="code">{installCode}</Text></Box><Box className="code-block"><Flex justify="space-between" className="code-head"><Span>USAGE</Span><Span>React 19</Span></Flex><Text as="pre">{usageCode}</Text></Box></Box></Flex></Box>
+        </Box>
         <Flex as="footer" className="footer" justify="space-between" align="center"><Text>© 2026 Mystique Mini</Text><Text>React components for thoughtful interfaces.</Text></Flex>
       </Box>
     </MystiqueProvider>
   )
 }
 
-createRoot(document.getElementById('root')!).render(<StrictMode><App /></StrictMode>)
+const root = document.getElementById('root')
+if (root) createRoot(root).render(<StrictMode><App /></StrictMode>)
