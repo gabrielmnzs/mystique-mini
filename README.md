@@ -1,6 +1,6 @@
 # Mystique Mini
 
-Mystique Mini is a compact React design system for learning and building small, expressive interfaces. v1 combines a token-based styled-system, a theme/provider, a polymorphic component factory, and seven focused components. The repository is `mystique-mini`; the published package is `@gabrielmnzs/mystique-react`.
+Mystique Mini is a compact React design system for learning and building small, expressive interfaces. v1 combines a token-based styled-system, a theme/provider, a polymorphic component factory, and seven focused components. The repository is `mystique-mini`; the package is configured for private publication to GitHub Packages as `@gabrielmnzs/mystique-react` once the publish gate completes.
 
 ## Requirements and development
 
@@ -37,6 +37,7 @@ Components accept style props such as spacing, sizing, layout, typography, color
 import {
   Box,
   Circle,
+  Flex,
   MystiqueProvider,
   Square,
   extendTheme,
@@ -61,17 +62,13 @@ export function Example() {
   return (
     <MystiqueProvider theme={theme}>
       <Card variant="featured" recipeSize="sm" p={{ base: 3, md: 6 }}>
-        <Box
-          as="a"
-          href="/docs"
-          color="paper"
-          direction={{ base: 'column', md: 'row' }}
-          _hover={{ color: 'accent' }}
-        >
-          Read the docs
-        </Box>
-        <Square size={{ base: '2rem', md: '3rem' }} bg="accent" />
-        <Circle size="2rem" bg="accent" />
+        <Flex direction={{ base: 'column', md: 'row' }} gap="2">
+          <Box as="a" href="/docs" color="paper" _hover={{ color: 'accent' }}>
+            Read the docs
+          </Box>
+          <Square size={{ base: '2rem', md: '3rem' }} bg="accent" />
+          <Circle size="2rem" bg="accent" />
+        </Flex>
       </Card>
     </MystiqueProvider>
   )
@@ -90,4 +87,4 @@ When wrapping a custom component with `mystique()`, that component must forward 
 
 ## v1 scope
 
-Dark mode is not part of v1. Also deferred to the roadmap are semantic tokens, extended selectors, the full CSS prop catalog, advanced layouts, interactive and form controls, SSR adapters, Storybook visual regression, and motion components.
+Color mode, including dark mode, is excluded from v1. Also deferred to the roadmap are semantic tokens, extended selectors, the full CSS prop catalog, advanced layouts, interactive and form controls, SSR adapters, Storybook visual regression, and motion components.

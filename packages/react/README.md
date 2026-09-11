@@ -10,7 +10,7 @@ For an existing React 19 app, install the package and its Emotion peer dependenc
 pnpm add @gabrielmnzs/mystique-react @emotion/react
 ```
 
-The package is published to GitHub Packages. Before installing, add this to the consuming project's `.npmrc`:
+The package is configured for private publication to GitHub Packages; the actual publish gate is still pending. Before installing after that gate completes, add this to the consuming project's `.npmrc`:
 
 ```ini
 @gabrielmnzs:registry=https://npm.pkg.github.com
@@ -38,7 +38,7 @@ export function App() {
 `MystiqueProvider` supplies the default theme and enables the root global reset. Pass `resetCSS={false}` to disable that reset. `extendTheme` deep-merges custom tokens and component recipes:
 
 ```tsx
-import { Box, extendTheme, MystiqueProvider, mystique } from '@gabrielmnzs/mystique-react'
+import { Box, extendTheme, Flex, MystiqueProvider, mystique } from '@gabrielmnzs/mystique-react'
 
 const theme = extendTheme({
   colors: { brand: '#9f3d2d' },
@@ -57,7 +57,10 @@ export function Example() {
   return (
     <MystiqueProvider theme={theme}>
       <Notice p={{ base: 3, md: 6 }} _focus={{ borderColor: 'brand' }}>
-        <Box direction={['column', 'row']} gap="2">Responsive content</Box>
+        <Flex direction={['column', 'row']} gap="2">
+          <Box>Responsive content</Box>
+          <Box>More content</Box>
+        </Flex>
       </Notice>
     </MystiqueProvider>
   )
