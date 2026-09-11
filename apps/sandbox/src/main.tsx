@@ -68,11 +68,14 @@ export function App() {
       copyTimeout.current = null
     }
   }
-  useEffect(() => () => {
-    mountedRef.current = false
-    copyRequestId.current += 1
-    if (copyTimeout.current !== null) window.clearTimeout(copyTimeout.current)
-    copyTimeout.current = null
+  useEffect(() => {
+    mountedRef.current = true
+    return () => {
+      mountedRef.current = false
+      copyRequestId.current += 1
+      if (copyTimeout.current !== null) window.clearTimeout(copyTimeout.current)
+      copyTimeout.current = null
+    }
   }, [])
   const showCopyState = (requestId: number, state: Exclude<typeof copyState, 'idle'>) => {
     if (!mountedRef.current || requestId !== copyRequestId.current) return
@@ -133,7 +136,7 @@ export function App() {
 
         <Box as="section" className="recipe-section" aria-labelledby="recipe-title"><SectionLabel number="02">Recipe card</SectionLabel><Flex className="recipe-layout" gap="clamp(2rem, 7vw, 7rem)" align="center"><Box flex="1"><Text as="h2" id="recipe-title">Tokens in,<br /><em>character out.</em></Text><Text className="body-copy">Theme configuration stays close to the surface. Add your palette, shape a component recipe, and let the components carry the rhythm.</Text></Box><Specimen className="recipe-preview"><Span className="eyebrow">Specimen / default</Span><Text as="h3">A custom recipe</Text><Flex align="center" gap="0.75rem" mt="2rem"><Circle boxSize="2.5rem" bg="coral" /><Box><Text fontWeight="bold">Default props in action</Text><Text className="muted">variant: quiet · recipeSize: lg</Text></Box></Flex></Specimen></Flex></Box>
 
-        <Box as="section" id="setup" tabIndex={-1} className="setup-section" aria-labelledby="setup-title"><SectionLabel number="03">Start here</SectionLabel><Flex className="setup-layout" gap="clamp(2rem, 7vw, 7rem)"><Box flex="1"><Text as="h2" id="setup-title">Bring your<br /><em>own atmosphere.</em></Text><Text className="body-copy">For an existing React 19 app. Node 24 and pnpm 11 keep the baseline pleasantly modern.</Text><Text className="reset-note">Provider resetCSS: on by default.</Text><Box className="install-prerequisite"><strong>Private registry prerequisite</strong><br />@gabrielmnzs:registry=https://npm.pkg.github.com<br /><code>export GITHUB_TOKEN=your-token</code><br /><code>{registryCode}</code><br /><span>(requires read:packages)</span>.</Box><Box as="button" className="copy-install" onClick={copyInstall}>{copyLabel}<Span>↗</Span></Box><Text role="status" aria-live="polite" className="copy-status">{copyState === 'idle' ? '' : copyLabel}</Text></Box><Box flex="1" className="code-column"><Box className="code-block"><Flex justify="space-between" className="code-head"><Span>INSTALL</Span><Span>pnpm 11 · node 24</Span></Flex><Text as="code">{installCode}</Text></Box><Box className="code-block"><Flex justify="space-between" className="code-head"><Span>USAGE</Span><Span>React 19</Span></Flex><Text as="pre">{usageCode}</Text></Box></Box></Flex></Box>
+        <Box as="section" id="setup" tabIndex={-1} className="setup-section" aria-labelledby="setup-title"><SectionLabel number="03">Start here</SectionLabel><Flex className="setup-layout" gap="clamp(2rem, 7vw, 7rem)"><Box flex="1"><Text as="h2" id="setup-title">Bring your<br /><em>own atmosphere.</em></Text><Text className="body-copy">For an existing React 19 app. Node 24 and pnpm 11 keep the baseline pleasantly modern.</Text><Text className="reset-note">Provider resetCSS: on by default.</Text><Box className="install-prerequisite"><strong>Private registry prerequisite</strong><br /><span>Put both registry lines in <code>.npmrc</code>:</span><br />@gabrielmnzs:registry=https://npm.pkg.github.com<br /><code>{registryCode}</code><br /><span>Then set <code>GITHUB_TOKEN</code> to a classic PAT with <code>read:packages</code> access:</span><br /><code>export GITHUB_TOKEN=your-token</code>.</Box><Box as="button" className="copy-install" onClick={copyInstall}>{copyLabel}<Span>↗</Span></Box><Text role="status" aria-live="polite" className="copy-status">{copyState === 'idle' ? '' : copyLabel}</Text></Box><Box flex="1" className="code-column"><Box className="code-block"><Flex justify="space-between" className="code-head"><Span>INSTALL</Span><Span>pnpm 11 · node 24</Span></Flex><Text as="code">{installCode}</Text></Box><Box className="code-block"><Flex justify="space-between" className="code-head"><Span>USAGE</Span><Span>React 19</Span></Flex><Text as="pre">{usageCode}</Text></Box></Box></Flex></Box>
         </Box>
         <Flex as="footer" className="footer" justify="space-between" align="center"><Text>© 2026 Mystique Mini</Text><Text>React components for thoughtful interfaces.</Text></Flex>
       </Box>

@@ -1,4 +1,5 @@
 import { cleanup, fireEvent, render, screen } from '@testing-library/react'
+import { StrictMode } from 'react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { App } from './main'
 
@@ -23,6 +24,15 @@ describe('install command clipboard feedback', () => {
     fireEvent.click(installButton())
     await vi.waitFor(() => expect(screen.getByRole('status')).toHaveTextContent(/copied/i))
     expect(writeText).toHaveBeenCalledWith('pnpm add @gabrielmnzs/mystique-react @emotion/react')
+  })
+
+  it('shows success feedback in React StrictMode', async () => {
+    Object.assign(navigator, { clipboard: { writeText: vi.fn().mockResolvedValue(undefined) } })
+    render(<StrictMode><App /></StrictMode>)
+
+    fireEvent.click(installButton())
+
+    await vi.waitFor(() => expect(screen.getByRole('status')).toHaveTextContent(/copied/i))
   })
 
   it('reports rejection and unavailable clipboard distinctly', async () => {
@@ -76,6 +86,7 @@ describe('install command clipboard feedback', () => {
     resolveWrite()
     await Promise.resolve()
     expect(screen.queryByRole('status')).not.toBeInTheDocument()
+    expect(vi.getTimerCount()).toBe(0)
   })
 
   it('only shows feedback for the newest overlapping write', async () => {
