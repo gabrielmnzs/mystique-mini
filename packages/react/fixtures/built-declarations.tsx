@@ -1,6 +1,6 @@
 import {
   Box, Center, Circle, Flex, Span, Square, Text,
-  type PolymorphicProps, type ResponsiveValue, type StyleProps,
+  type CircleProps, type PolymorphicProps, type ResponsiveValue, type SquareProps, type StyleProps,
 } from '@gabrielmnzs/mystique-react'
 import { createRef, type ComponentProps, type ComponentRef } from 'react'
 
@@ -18,7 +18,9 @@ const styles: StyleProps = { p: sizes }
 const props: PolymorphicProps<'a'> = { href: '/props', color: 'blue.500' }
 const componentProps: ComponentProps<typeof Square> = { size: sizes }
 const componentRef: ComponentRef<typeof Circle> = document.createElement('div')
-void [href, styles, props, componentProps, componentRef]
+const squareProps: SquareProps = { size: sizes }
+const circleProps: CircleProps = { size: 'sm' }
+void [href, styles, props, componentProps, componentRef, squareProps, circleProps]
 
 // @ts-expect-error href is not valid on the default div target
 const invalidHref = <Box href="/no" />

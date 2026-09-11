@@ -3,6 +3,19 @@ import * as publicApi from '../index'
 import { getStylePropDefinition } from './style-config'
 
 describe('system public API', () => {
+  it('exposes only the v1 runtime API from the package root', () => {
+    expect(Object.keys(publicApi).sort()).toEqual([
+      'Box', 'Center', 'Circle', 'Flex', 'MystiqueProvider', 'Span', 'Square', 'Text',
+      'defaultTheme', 'extendTheme', 'mystique', 'useMystiqueTheme',
+    ].sort())
+  })
+
+  it('does not expose private runtime helpers from the package root', () => {
+    for (const name of ['mystiqueVersion', 'getToken', 'isCSSValue', 'isStyleProp', 'isPseudoProp', 'shouldForwardProp', 'filterProps']) {
+      expect(publicApi).not.toHaveProperty(name)
+    }
+  })
+
   it('does not expose style configuration internals from the package root', () => {
     expect(publicApi).not.toHaveProperty('stylePropConfig')
     expect(publicApi).not.toHaveProperty('aliases')

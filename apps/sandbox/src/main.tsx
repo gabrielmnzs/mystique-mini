@@ -1,9 +1,7 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
-import { mystiqueVersion } from '@gabrielmnzs/mystique-react'
-
 function App() {
-  return <main>Mystique {mystiqueVersion}</main>
+  return <main>Mystique</main>
 }
 
 createRoot(document.getElementById('root')!).render(

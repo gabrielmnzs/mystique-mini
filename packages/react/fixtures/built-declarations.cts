@@ -1,6 +1,8 @@
 import mystique = require('@gabrielmnzs/mystique-react')
 
 const { Box, Circle, Square, Text } = mystique
+const squareProps: mystique.SquareProps = { size: 2 }
+const circleProps: mystique.CircleProps = { size: 'sm' }
 type ComponentProps<T extends import('react').ElementType> = import('react').ComponentProps<T>
 type ComponentRef<T extends import('react').ElementType> = import('react').ComponentRef<T>
 
@@ -11,7 +13,7 @@ const valid = [
 ]
 const componentProps: ComponentProps<typeof Square> = { size: 2 }
 const componentRef: ComponentRef<typeof Circle> = document.createElement('div')
-void [valid, componentProps, componentRef]
+void [valid, componentProps, componentRef, squareProps, circleProps]
 
 // @ts-expect-error href is not valid on the default div target
 const invalidHref = Box({ href: '/no' })
