@@ -16,11 +16,13 @@ describe('install command clipboard feedback', () => {
   })
 
   it('reports success after copying', async () => {
-    Object.assign(navigator, { clipboard: { writeText: vi.fn().mockResolvedValue(undefined) } })
+    const writeText = vi.fn().mockResolvedValue(undefined)
+    Object.assign(navigator, { clipboard: { writeText } })
     render(<App />)
 
     fireEvent.click(installButton())
     await vi.waitFor(() => expect(screen.getByRole('status')).toHaveTextContent(/copied/i))
+    expect(writeText).toHaveBeenCalledWith('pnpm add @gabrielmnzs/mystique-react @emotion/react')
   })
 
   it('reports rejection and unavailable clipboard distinctly', async () => {
@@ -62,5 +64,42 @@ describe('install command clipboard feedback', () => {
     await vi.waitFor(() => expect(screen.getByRole('status')).toHaveTextContent(/copied/i))
     unmount()
     expect(clearTimeoutSpy).toHaveBeenCalled()
+  })
+
+  it('ignores a pending clipboard write that resolves after unmount', async () => {
+    let resolveWrite!: () => void
+    Object.assign(navigator, { clipboard: { writeText: vi.fn(() => new Promise<void>((resolve) => { resolveWrite = resolve })) } })
+    const { unmount } = render(<App />)
+    fireEvent.click(installButton())
+    unmount()
+
+    resolveWrite()
+    await Promise.resolve()
+    expect(screen.queryByRole('status')).not.toBeInTheDocument()
+  })
+
+  it('only shows feedback for the newest overlapping write', async () => {
+    const writes: Array<() => void> = []
+    Object.assign(navigator, { clipboard: { writeText: vi.fn(() => new Promise<void>((resolve) => writes.push(resolve))) } })
+    render(<App />)
+    fireEvent.click(installButton())
+    fireEvent.click(installButton())
+
+    writes[0]()
+    await Promise.resolve()
+    expect(screen.getByRole('status')).toBeEmptyDOMElement()
+    writes[1]()
+    await vi.waitFor(() => expect(screen.getByRole('status')).toHaveTextContent(/copied/i))
+  })
+
+  it('scrolls to and focuses Setup from the polymorphic button', () => {
+    const scrollIntoView = vi.fn()
+    Object.defineProperty(HTMLElement.prototype, 'scrollIntoView', { configurable: true, value: scrollIntoView })
+    render(<App />)
+
+    fireEvent.click(screen.getByRole('button', { name: /as button.*setup/i }))
+
+    expect(scrollIntoView).toHaveBeenCalled()
+    expect(document.activeElement).toBe(document.getElementById('setup'))
   })
 })

@@ -1,6 +1,6 @@
 @import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700&family=Newsreader:opsz,wght@6..72,400;6..72,500&display=swap');
 
-:root { --ink: #15231f; --paper: #f4f0e8; --accent: #9f3d2d; font-synthesis: none; }
+:root { --ink: #15231f; --paper: #f4f0e8; --accent: #9f3d2d; --peach: #ffad98; font-synthesis: none; }
 * { box-sizing: border-box; }
 html { scroll-behavior: smooth; }
 body { margin: 0; min-width: 320px; }
@@ -21,6 +21,7 @@ button { font: inherit; }
 .hero-title, h2 { margin: 0; font-family: 'Newsreader', Georgia, serif; font-weight: 400; letter-spacing: -.055em; line-height: .93; }
 .hero-title { font-size: clamp(4rem, 10.5vw, 9rem); max-width: 950px; }
 em { color: var(--accent); font-style: normal; }
+.specimen em { color: var(--peach); }
 .hero-bottom { margin-top: clamp(3rem, 8vw, 7rem); }
 .hero-copy, .body-copy { max-width: 31rem; font-size: clamp(.9rem, 1.5vw, 1.1rem); line-height: 1.65; }
 .scroll-cue { display: flex; align-items: center; gap: .6rem; border-bottom: 1px solid; padding-bottom: .4rem; font-size: .72rem; text-transform: uppercase; letter-spacing: .08em; white-space: nowrap; }
