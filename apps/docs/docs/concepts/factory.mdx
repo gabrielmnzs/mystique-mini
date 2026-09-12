@@ -1,0 +1,49 @@
+---
+title: Component factory
+description:
+  Build typed intrinsic components with styles, recipes, forwarding, and prop
+  filtering.
+---
+
+`mystique` creates React components backed by the active system. Use either the
+callable form or an intrinsic property.
+
+```tsx
+import { mystique } from 'mystique-mini-react';
+
+export const Panel = mystique('section', {
+  className: 'app-panel',
+  base: {
+    border: 'thin',
+    borderColor: 'gray.700',
+    p: '4',
+    rounded: 'lg',
+  },
+});
+
+export const InlineCode = mystique.code;
+```
+
+Factory components forward refs, filter system-only props from the DOM, accept
+the `css` prop, and preserve intrinsic element attributes. The second argument
+may include `base`, `variants`, `defaultVariants`, `compoundVariants`, and
+`className`.
+
+```tsx
+import { defineRecipe, mystique } from 'mystique-mini-react';
+
+const badgeRecipe = defineRecipe({
+  base: { display: 'inline-flex', px: '2', py: '1', rounded: 'full' },
+  variants: {
+    tone: {
+      quiet: { bg: 'gray.800', color: 'gray.100' },
+      action: { bg: 'blue.600', color: 'white' },
+    },
+  },
+  defaultVariants: { tone: 'quiet' },
+});
+
+export const Badge = mystique('span', badgeRecipe);
+```
+
+<RecipePreview />

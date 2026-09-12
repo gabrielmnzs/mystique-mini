@@ -1,0 +1,33 @@
+---
+title: Box
+description:
+  A neutral div primitive for layout, styling, and polymorphic composition.
+---
+
+```tsx
+import { Box } from 'mystique-mini-react';
+```
+
+`Box` renders a `div` and adds no layout style of its own.
+
+```tsx
+export function Card() {
+  return (
+    <Box
+      as="article"
+      bg="gray.900"
+      border="thin"
+      borderColor="gray.700"
+      color="gray.50"
+      p="4"
+      rounded="lg"
+    >
+      Card content
+    </Box>
+  );
+}
+```
+
+Use it as a low-level container when a more specific component does not describe
+the content. `as` changes the rendered element without changing the styling
+contract.

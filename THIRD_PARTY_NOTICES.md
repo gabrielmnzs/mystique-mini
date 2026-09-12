@@ -42,8 +42,7 @@ SOFTWARE.
 ## Emotion
 
 - Project: Emotion
-- Published package dependencies: `@emotion/cache` and
-  `@emotion/is-prop-valid`
+- Published package dependencies: `@emotion/cache` and `@emotion/is-prop-valid`
 - Required peer dependency: `@emotion/react`
 - Source: <https://github.com/emotion-js/emotion>
 - License: MIT
@@ -54,9 +53,9 @@ transitive Emotion packages retain the notices and license files shipped by
 their own distributions. `@emotion/styled` is neither a Mystique dependency nor
 part of the packed artifacts.
 
-The repository's Next.js fixtures additionally install `@emotion/server` to
-test Pages Router extraction. That test-only dependency is not part of the
-published Mystique package contract.
+The repository's Next.js fixtures additionally install `@emotion/server` to test
+Pages Router extraction. That test-only dependency is not part of the published
+Mystique package contract.
 
 ```text
 MIT License

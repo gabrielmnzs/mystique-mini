@@ -1,9 +1,14 @@
 {
   "extends": "../../tsconfig.json",
-  "include": ["src", "fixtures/**/*.ts", "fixtures/**/*.tsx", "vitest.config.ts"],
+  "include": [
+    "src",
+    "fixtures/**/*.ts",
+    "fixtures/**/*.tsx",
+    "vitest.config.ts"
+  ],
   "compilerOptions": {
     "baseUrl": ".",
-    "paths": { "@gabrielmnzs/mystique-react": ["./src/index.ts"] },
+    "paths": { "mystique-mini-react": ["./src/index.ts"] },
     "types": ["vitest/globals", "@testing-library/jest-dom"]
   },
   "exclude": ["fixtures/**/*.cts"]

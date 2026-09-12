@@ -1,0 +1,36 @@
+---
+title: CSS layers
+description:
+  Understand reset, base, token, and recipe ordering or opt out when integrating
+  another shell.
+---
+
+The default system emits an explicit layer statement and assigns generated
+global CSS to four layers:
+
+1. `reset` for preflight
+2. `base` for configured global selectors
+3. `tokens` for CSS custom properties
+4. `recipes` for recipe output
+
+```ts
+import { defineConfig } from 'mystique-mini-react';
+
+const config = defineConfig({
+  layers: ['reset', 'base', 'tokens', 'recipes'],
+});
+```
+
+Set `preflight: false` when another framework owns the reset. Use an empty
+`globalCss` object when the host shell also owns base selectors.
+
+```ts
+const embeddedConfig = defineConfig({
+  preflight: false,
+  globalCss: {},
+});
+```
+
+Set `disableLayers: true` only when the consuming cascade cannot use CSS layers.
+The rules are still generated, but layer wrappers are omitted. Review ordering
+carefully because unlayered host CSS has different precedence.

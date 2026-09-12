@@ -1,0 +1,66 @@
+name: Feature request
+description: Propose an improvement to the library, tooling, or documentation.
+title: '[Feature]: '
+labels:
+  - enhancement
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for proposing an improvement. Describe the problem first so the
+        project can evaluate the smallest useful solution.
+
+  - type: checkboxes
+    id: prerequisites
+    attributes:
+      label: Prerequisites
+      options:
+        - label:
+            I searched the existing issues and discussions for this request.
+          required: true
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: What limitation or use case should this proposal address?
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed solution
+      description: Describe the desired behavior and public API, if applicable.
+    validations:
+      required: true
+
+  - type: textarea
+    id: usage-example
+    attributes:
+      label: Example usage
+      description: Show what the proposed API or workflow could look like.
+      render: tsx
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      description: What workarounds or alternative designs have you evaluated?
+
+  - type: dropdown
+    id: contribution
+    attributes:
+      label: Would you like to contribute this change?
+      options:
+        - 'Yes'
+        - 'No'
+        - 'Maybe, with guidance'
+    validations:
+      required: true
+
+  - type: textarea
+    id: additional-context
+    attributes:
+      label: Additional context
+      description: Add screenshots, references, or other relevant information.

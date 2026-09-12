@@ -1,0 +1,29 @@
+---
+title: Square
+description: A centered primitive whose size sets equal width and height.
+---
+
+```tsx
+import { Square } from 'mystique-mini-react';
+```
+
+`Square` maps its `size` prop to `boxSize` and centers children with flexbox.
+
+```tsx
+export function Initial() {
+  return (
+    <Square
+      bg="blue.600"
+      color="white"
+      rounded="lg"
+      size={{ base: '10', md: '12' }}
+    >
+      MM
+    </Square>
+  );
+}
+```
+
+`size` accepts the same scalar, array, or condition object forms as other
+responsive values. It is a visual sizing prop, not the native HTML `size`
+attribute.

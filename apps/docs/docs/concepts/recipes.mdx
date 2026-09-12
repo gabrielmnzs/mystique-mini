@@ -1,0 +1,47 @@
+---
+title: Recipes
+description:
+  Store reusable single-part variants in configuration or pass them directly to
+  the factory.
+---
+
+Define a recipe with `defineRecipe` to preserve literal variant inference.
+
+```ts
+import { defineConfig, defineRecipe } from 'mystique-mini-react';
+
+const text = defineRecipe({
+  base: { margin: 0 },
+  variants: {
+    emphasis: {
+      quiet: { color: 'muted' },
+      strong: { color: 'fg', fontWeight: 'bold' },
+    },
+  },
+  defaultVariants: { emphasis: 'quiet' },
+});
+
+export const config = defineConfig({
+  theme: { recipes: { text } },
+});
+```
+
+Named recipes are queried from the compiled system. `Text` uses the recipe key
+`text`, so customizing that key changes its recipe surface.
+
+```tsx
+import { Text } from 'mystique-mini-react';
+
+export function Summary() {
+  return <Text emphasis="strong">Build succeeded</Text>;
+}
+```
+
+For an application-specific component, pass a recipe directly to `mystique`.
+
+```ts
+const Tag = mystique('span', tagRecipe);
+```
+
+Recipe selection props use their declared names and accept conditional values.
+Ordinary system props and `css` remain available for local composition.

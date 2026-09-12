@@ -1,0 +1,112 @@
+name: Bug report
+description: Report reproducible behavior that is incorrect or unexpected.
+title: '[Bug]: '
+labels:
+  - bug
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for helping improve Mystique Mini. Please provide enough detail
+        for someone else to reproduce the problem.
+
+  - type: checkboxes
+    id: prerequisites
+    attributes:
+      label: Prerequisites
+      options:
+        - label: I searched the existing issues for a duplicate.
+          required: true
+        - label: I can reproduce this issue with a supported version.
+          required: true
+
+  - type: input
+    id: package-version
+    attributes:
+      label: Package version
+      description: Which version of mystique-mini-react are you using?
+      placeholder: 0.2.0
+    validations:
+      required: true
+
+  - type: dropdown
+    id: framework
+    attributes:
+      label: Framework
+      options:
+        - React
+        - Next.js 15
+        - Next.js 16
+        - Other
+    validations:
+      required: true
+
+  - type: input
+    id: reproduction
+    attributes:
+      label: Minimal reproduction
+      description: Link to a minimal repository, sandbox, or failing test.
+      placeholder: https://github.com/example/reproduction
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      description:
+        List the smallest sequence that consistently triggers the issue.
+      placeholder: |
+        1. Install ...
+        2. Render ...
+        3. Observe ...
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+      description: What did you expect to happen?
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behavior
+      description: What happened instead?
+    validations:
+      required: true
+
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment
+      description:
+        Include React, Next.js, Node.js, package manager, OS, and browser
+        versions.
+      placeholder: |
+        React: 19.x
+        Next.js: 16.x
+        Node.js: 24.x
+        pnpm: 11.x
+        OS: macOS
+        Browser: Chrome
+    validations:
+      required: true
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Relevant logs
+      description:
+        Remove secrets and personal information before pasting output.
+      render: shell
+
+  - type: textarea
+    id: additional-context
+    attributes:
+      label: Additional context
+      description:
+        Add any other information that may help investigate the issue.

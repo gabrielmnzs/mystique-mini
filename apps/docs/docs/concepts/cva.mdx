@@ -1,0 +1,54 @@
+---
+title: CVA
+description:
+  Compile base, variant, default, compound, and responsive recipe styles.
+---
+
+`system.cva` compiles a single-part recipe into a callable function.
+
+```ts
+import { createSystem } from 'mystique-mini-react';
+import { defaultConfig } from 'mystique-mini-react/preset';
+
+const system = createSystem(defaultConfig);
+
+const button = system.cva({
+  base: { display: 'inline-flex', px: '4', py: '2', rounded: 'lg' },
+  variants: {
+    tone: {
+      neutral: { bg: 'gray.800', color: 'gray.100' },
+      action: { bg: 'blue.600', color: 'white' },
+    },
+    size: {
+      sm: { fontSize: 'sm' },
+      lg: { fontSize: 'lg' },
+    },
+  },
+  defaultVariants: { tone: 'neutral', size: 'sm' },
+  compoundVariants: [
+    { tone: 'action', size: 'lg', css: { fontWeight: 'bold' } },
+  ],
+});
+```
+
+Variant values may be responsive.
+
+```ts
+const styles = button({
+  tone: { base: 'neutral', md: 'action' },
+  size: 'lg',
+});
+```
+
+Separate recipe props before forwarding element props.
+
+```ts
+const [variantProps, elementProps] = button.splitVariantProps({
+  tone: 'action',
+  id: 'save',
+});
+```
+
+`variantProps` contains `tone`; `elementProps` contains `id`. The factory
+performs the corresponding split automatically when a recipe is supplied as its
+second argument.

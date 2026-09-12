@@ -5,4 +5,4 @@ export type {
   SystemProperties,
   SystemStyleObject,
   SystemStyleObjectInput,
-} from '../types'
+} from '../types';

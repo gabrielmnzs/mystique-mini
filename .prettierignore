@@ -1,0 +1,16 @@
+node_modules/
+.pnpm-store/
+dist/
+coverage/
+.turbo/
+.next/
+.docusaurus/
+.playwright-cli/
+playwright-report/
+test-results/
+.slim/
+docs/superpowers/
+pnpm-lock.yaml
+*.log
+*.tsbuildinfo
+**/next-env.d.ts

@@ -1,12 +1,13 @@
-import type { Metadata } from 'next'
-import type { ReactNode } from 'react'
-import { AppProviders } from './providers'
+import type { ReactNode } from 'react';
+import type { Metadata } from 'next';
+
+import { AppProviders } from './providers';
 
 export const metadata: Metadata = {
   title: 'Mystique Next 16 smoke',
   description: 'Persistent App Router and Pages Router consumer fixture.',
   other: { 'mystique-smoke': 'next16' },
-}
+};
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
@@ -15,5 +16,5 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         <AppProviders>{children}</AppProviders>
       </body>
     </html>
-  )
+  );
 }

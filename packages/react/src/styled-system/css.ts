@@ -1,2 +1,2 @@
-export { createCss } from './serialize'
-export type { CssFn } from './types'
+export { createCss } from './serialize';
+export type { CssFn } from './types';

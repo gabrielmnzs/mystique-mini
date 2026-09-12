@@ -1,4 +1,4 @@
-import { defineConfig } from '@gabrielmnzs/mystique-react/styled-system'
+import { defineConfig } from 'mystique-mini-react/styled-system';
 
 export const fixtureConfig = defineConfig({
   cssVarsPrefix: 'mystique',
@@ -33,4 +33,4 @@ export const fixtureConfig = defineConfig({
       },
     },
   },
-})
+});

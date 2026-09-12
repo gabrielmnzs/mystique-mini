@@ -1,0 +1,41 @@
+---
+title: Provider
+description:
+  Compile and provide one Mystique system context at the application boundary.
+---
+
+`MystiqueProvider` supplies the compiled system and an Emotion cache to every
+Mystique component below it.
+
+```tsx
+import type { ReactNode } from 'react';
+
+import { MystiqueProvider, createSystem } from 'mystique-mini-react';
+import { defaultConfig } from 'mystique-mini-react/preset';
+
+const system = createSystem(defaultConfig);
+
+export function DesignSystemProvider({ children }: { children: ReactNode }) {
+  return <MystiqueProvider value={system}>{children}</MystiqueProvider>;
+}
+```
+
+Create the system at module scope so renders reuse the same immutable context.
+Consumers below the provider can access it with `useMystiqueContext` or its
+alias, `useSystemContext`.
+
+```tsx
+import { useMystiqueContext } from 'mystique-mini-react';
+
+export function BrandValue() {
+  const system = useMystiqueContext();
+  return <output>{system.token('colors.blue.600')}</output>;
+}
+```
+
+The hook intentionally throws outside the provider. This makes a missing
+application boundary visible instead of silently falling back to a different
+theme.
+
+For Next.js App Router streaming, use [`MystiqueNextProvider`](../next/) rather
+than the core provider.

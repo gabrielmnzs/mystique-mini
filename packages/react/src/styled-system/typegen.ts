@@ -1,83 +1,104 @@
-import { isBlockedKey, isPlainObject } from './utils'
-import { createBreakpoints } from './breakpoints'
-import type { ConditionalValue } from './types'
+import { createBreakpoints } from './breakpoints';
+import type { ConditionalValue } from './types';
+import { isBlockedKey, isPlainObject } from './utils';
 
 export interface TypegenOptions {
-  moduleName?: string
-  banner?: string
+  moduleName?: string;
+  banner?: string;
 }
 
 interface TypegenConfig {
-  conditions?: Record<string, unknown>
-  utilities?: Record<string, unknown>
+  conditions?: Record<string, unknown>;
+  utilities?: Record<string, unknown>;
   theme?: {
-    breakpoints?: Record<string, string | { value: string }>
-    tokens?: Record<string, unknown>
-    semanticTokens?: Record<string, unknown>
-    recipes?: Record<string, unknown>
-    slotRecipes?: Record<string, unknown>
-  }
+    breakpoints?: Record<string, string | { value: string }>;
+    tokens?: Record<string, unknown>;
+    semanticTokens?: Record<string, unknown>;
+    recipes?: Record<string, unknown>;
+    slotRecipes?: Record<string, unknown>;
+  };
 }
 
 function breakpointValues(
   value: NonNullable<TypegenConfig['theme']>['breakpoints'],
 ): Record<string, string> {
-  if (!isPlainObject(value)) return {}
-  return Object.fromEntries(Object.entries(value).flatMap(([name, input]) => {
-    if (typeof input === 'string') return [[name, input]]
-    if (isPlainObject(input) && typeof input.value === 'string') {
-      return [[name, input.value]]
-    }
-    return []
-  }))
+  if (!isPlainObject(value)) return {};
+  return Object.fromEntries(
+    Object.entries(value).flatMap(([name, input]) => {
+      if (typeof input === 'string') return [[name, input]];
+      if (isPlainObject(input) && typeof input.value === 'string') {
+        return [[name, input.value]];
+      }
+      return [];
+    }),
+  );
 }
 
 function paths(value: unknown, prefix = ''): string[] {
-  if (!isPlainObject(value)) return []
-  if (Object.prototype.hasOwnProperty.call(value, 'value')) return prefix ? [prefix] : []
-  const result: string[] = []
+  if (!isPlainObject(value)) return [];
+  if (Object.prototype.hasOwnProperty.call(value, 'value'))
+    return prefix ? [prefix] : [];
+  const result: string[] = [];
   for (const key of Object.keys(value).sort()) {
-    if (isBlockedKey(key)) continue
-    result.push(...paths(value[key], prefix ? `${prefix}.${key}` : key))
+    if (isBlockedKey(key)) continue;
+    result.push(...paths(value[key], prefix ? `${prefix}.${key}` : key));
   }
-  return result
+  return result;
 }
 
 function keys(value: unknown): string[] {
   return isPlainObject(value)
-    ? Object.keys(value).filter((key) => !isBlockedKey(key)).sort()
-    : []
+    ? Object.keys(value)
+        .filter((key) => !isBlockedKey(key))
+        .sort()
+    : [];
 }
 
 function union(values: readonly string[], fallback = 'never'): string {
-  return values.length > 0 ? values.map((value) => JSON.stringify(value)).join(' | ') : fallback
+  return values.length > 0
+    ? values.map((value) => JSON.stringify(value)).join(' | ')
+    : fallback;
 }
 
 function recipeVariants(recipes: unknown): string {
-  if (!isPlainObject(recipes)) return '{}'
-  const entries = Object.keys(recipes).sort().map((recipeName) => {
-    const recipe = recipes[recipeName]
-    const variants = isPlainObject(recipe) && isPlainObject(recipe.variants)
-      ? recipe.variants
-      : {}
-    const properties = Object.keys(variants).sort().map((variantName) => {
-      return `${JSON.stringify(variantName)}?: ${union(keys(variants[variantName]))}`
-    })
-    return `${JSON.stringify(recipeName)}: { ${properties.join('; ')} }`
-  })
-  return `{ ${entries.join('; ')} }`
+  if (!isPlainObject(recipes)) return '{}';
+  const entries = Object.keys(recipes)
+    .sort()
+    .map((recipeName) => {
+      const recipe = recipes[recipeName];
+      const variants =
+        isPlainObject(recipe) && isPlainObject(recipe.variants)
+          ? recipe.variants
+          : {};
+      const properties = Object.keys(variants)
+        .sort()
+        .map((variantName) => {
+          return `${JSON.stringify(variantName)}?: ${union(keys(variants[variantName]))}`;
+        });
+      return `${JSON.stringify(recipeName)}: { ${properties.join('; ')} }`;
+    });
+  return `{ ${entries.join('; ')} }`;
 }
 
 function slotRecipeSlots(recipes: unknown): string {
-  if (!isPlainObject(recipes)) return '{}'
-  const entries = Object.keys(recipes).sort().map((recipeName) => {
-    const recipe = recipes[recipeName]
-    const slots = isPlainObject(recipe) && Array.isArray(recipe.slots)
-      ? [...new Set(recipe.slots.filter((slot): slot is string => typeof slot === 'string'))].sort()
-      : []
-    return `${JSON.stringify(recipeName)}: ${union(slots)}`
-  })
-  return `{ ${entries.join('; ')} }`
+  if (!isPlainObject(recipes)) return '{}';
+  const entries = Object.keys(recipes)
+    .sort()
+    .map((recipeName) => {
+      const recipe = recipes[recipeName];
+      const slots =
+        isPlainObject(recipe) && Array.isArray(recipe.slots)
+          ? Array.from(
+              new Set(
+                recipe.slots.filter(
+                  (slot): slot is string => typeof slot === 'string',
+                ),
+              ),
+            ).sort()
+          : [];
+      return `${JSON.stringify(recipeName)}: ${union(slots)}`;
+    });
+  return `{ ${entries.join('; ')} }`;
 }
 
 /**
@@ -88,10 +109,10 @@ export function generateTypegen(
   input: TypegenConfig | { _config: TypegenConfig },
   options: TypegenOptions = {},
 ): string {
-  const config = '_config' in input ? input._config : input
-  const theme = config.theme ?? {}
-  const breakpointMap = breakpointValues(theme.breakpoints)
-  const breakpoints = createBreakpoints(breakpointMap)
+  const config = '_config' in input ? input._config : input;
+  const theme = config.theme ?? {};
+  const breakpointMap = breakpointValues(theme.breakpoints);
+  const breakpoints = createBreakpoints(breakpointMap);
   const tokenNames = [
     ...paths(theme.tokens),
     ...paths(theme.semanticTokens),
@@ -99,18 +120,19 @@ export function generateTypegen(
       `breakpoints.${name}`,
       `sizes.breakpoint-${name}`,
     ]),
-  ].sort()
-  const conditionNames = [
-    ...new Set([
+  ].sort();
+  const conditionNames = Array.from(
+    new Set([
       ...keys(config.conditions),
       ...Object.keys(breakpoints.conditions),
     ]),
-  ].sort()
-  const utilityNames = keys(config.utilities)
-  const recipeNames = keys(theme.recipes)
-  const slotRecipeNames = keys(theme.slotRecipes)
-  const moduleName = options.moduleName ?? '@gabrielmnzs/mystique-react'
-  const banner = options.banner ?? '/* Generated by mystique-typegen. Do not edit. */'
+  ).sort();
+  const utilityNames = keys(config.utilities);
+  const recipeNames = keys(theme.recipes);
+  const slotRecipeNames = keys(theme.slotRecipes);
+  const moduleName = options.moduleName ?? 'mystique-mini-react';
+  const banner =
+    options.banner ?? '/* Generated by mystique-typegen. Do not edit. */';
 
   return [
     banner,
@@ -128,51 +150,66 @@ export function generateTypegen(
     '}',
     'export {}',
     '',
-  ].join('\n')
+  ].join('\n');
 }
 
 export interface MystiqueTypegen {
   /** Reserved augmentation marker. */
-  readonly __typegen?: never
+  readonly __typegen?: never;
 }
 
-export type TokenName = MystiqueTypegen extends { tokens: infer Value extends string }
+export type TokenName = MystiqueTypegen extends {
+  tokens: infer Value extends string;
+}
   ? Value
-  : string
-export type ConditionName = MystiqueTypegen extends { conditions: infer Value extends string }
+  : string;
+export type ConditionName = MystiqueTypegen extends {
+  conditions: infer Value extends string;
+}
   ? Value
-  : string
-export type UtilityName = MystiqueTypegen extends { utilities: infer Value extends string }
+  : string;
+export type UtilityName = MystiqueTypegen extends {
+  utilities: infer Value extends string;
+}
   ? Value
-  : string
-export type RecipeName = MystiqueTypegen extends { recipeNames: infer Value extends string }
+  : string;
+export type RecipeName = MystiqueTypegen extends {
+  recipeNames: infer Value extends string;
+}
   ? Value
-  : string
-export type SlotRecipeName = MystiqueTypegen extends { slotRecipeNames: infer Value extends string }
+  : string;
+export type SlotRecipeName = MystiqueTypegen extends {
+  slotRecipeNames: infer Value extends string;
+}
   ? Value
-  : string
+  : string;
 
 type Conditionalize<Props> = {
-  [Key in keyof Props]?: ConditionalValue<Exclude<Props[Key], undefined>>
-}
+  [Key in keyof Props]?: ConditionalValue<Exclude<Props[Key], undefined>>;
+};
 
-export type RecipeTypegenProps<Name extends string> =
-  MystiqueTypegen extends { recipes: infer Recipes extends Record<string, object> }
-    ? Name extends keyof Recipes
-      ? Conditionalize<Recipes[Name]>
-      : object
+export type RecipeTypegenProps<Name extends string> = MystiqueTypegen extends {
+  recipes: infer Recipes extends Record<string, object>;
+}
+  ? Name extends keyof Recipes
+    ? Conditionalize<Recipes[Name]>
     : object
+  : object;
 
 export type SlotRecipeTypegenProps<Name extends string> =
-  MystiqueTypegen extends { slotRecipes: infer Recipes extends Record<string, object> }
+  MystiqueTypegen extends {
+    slotRecipes: infer Recipes extends Record<string, object>;
+  }
     ? Name extends keyof Recipes
       ? Conditionalize<Recipes[Name]>
       : object
-    : object
+    : object;
 
 export type SlotRecipeTypegenSlots<Name extends string> =
-  MystiqueTypegen extends { slotRecipeSlots: infer Recipes extends Record<string, string> }
+  MystiqueTypegen extends {
+    slotRecipeSlots: infer Recipes extends Record<string, string>;
+  }
     ? Name extends keyof Recipes
       ? Recipes[Name]
       : never
-    : string
+    : string;

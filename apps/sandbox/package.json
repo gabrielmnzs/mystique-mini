@@ -11,14 +11,15 @@
     "check-types": "tsc -b --pretty false"
   },
   "dependencies": {
-    "@gabrielmnzs/mystique-react": "workspace:*",
     "@emotion/react": "^11.14.0",
-    "@testing-library/react": "^16.3.0",
-    "@testing-library/jest-dom": "^6.6.3",
+    "mystique-mini-react": "workspace:*",
     "react": "^19.0.0",
     "react-dom": "^19.0.0"
   },
   "devDependencies": {
+    "@testing-library/jest-dom": "^6.6.3",
+    "@testing-library/react": "^16.3.0",
+    "@types/node": "^24.10.1",
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",
     "@vitejs/plugin-react": "^4.4.1",

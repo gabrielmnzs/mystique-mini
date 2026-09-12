@@ -1,10 +1,7 @@
-'use client'
+'use client';
 
-export {
-  MystiqueCacheProvider,
-  MystiqueNextProvider,
-} from './registry'
+export { MystiqueCacheProvider, MystiqueNextProvider } from './registry';
 export type {
   MystiqueCacheProviderProps,
   MystiqueNextProviderProps,
-} from './registry'
+} from './registry';

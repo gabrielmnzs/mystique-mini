@@ -1,0 +1,50 @@
+---
+title: Migration to 0.2
+description:
+  Move from the former scoped package and implicit provider behavior to the 0.2
+  API.
+---
+
+Version 0.2 changes the package name to `mystique-mini-react` and is configured
+for public npm publication after the initial release bootstrap. Replace imports
+from the former `@gabrielmnzs/mystique-react` name across source, tests,
+fixtures, generated declarations, and tooling configuration.
+
+```diff
+- import { Box } from '@gabrielmnzs/mystique-react'
++ import { Box } from 'mystique-mini-react'
+```
+
+The provider now requires a compiled system.
+
+```diff
+- <MystiqueProvider>{children}</MystiqueProvider>
++ <MystiqueProvider value={system}>{children}</MystiqueProvider>
+```
+
+Create it by layering application configuration over the default preset.
+
+```ts
+import { createSystem, defineConfig } from 'mystique-mini-react';
+import { defaultConfig } from 'mystique-mini-react/preset';
+
+const config = defineConfig({
+  theme: {
+    tokens: { colors: { brand: { value: '#2563eb' } } },
+  },
+});
+
+export const system = createSystem(defaultConfig, config);
+```
+
+Factory recipes are passed directly to `mystique(tag, recipe)`. Recipe variants
+keep their declared names, so there is no `recipeSize` escape prop.
+
+```diff
+- <Badge recipeSize="sm" />
++ <Badge size="sm" />
+```
+
+For App Router applications, replace the core provider at the client boundary
+with `MystiqueNextProvider`. Keep Pages Router extraction on the core provider
+and an explicit Emotion cache.

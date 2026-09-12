@@ -1,0 +1,36 @@
+---
+title: Upstream architecture
+description:
+  The immutable Chakra UI reference snapshot and Mystique Mini's deliberate
+  deviations.
+---
+
+Mystique Mini 0.2 is a selective architectural adaptation of Chakra UI, not a
+drop-in fork.
+
+The recorded upstream snapshot is
+[`@chakra-ui/react` 3.37.0 at commit `67abe9fb80240035a49264ed946fc6bb90ec6cb5`](https://github.com/chakra-ui/chakra-ui/commit/67abe9fb80240035a49264ed946fc6bb90ec6cb5).
+Pinning an immutable commit makes future comparisons reproducible.
+
+The adapted areas are the config and system pipeline, token dictionary,
+breakpoints and conditions, utilities, normalization and serialization, layers
+and preflight, CVA and SVA, recipe contexts, Emotion factory, provider, preset,
+selected primitives, and type generation.
+
+## Deliberate differences
+
+- The component catalog contains only `Box`, `Flex`, `Center`, `Square`,
+  `Circle`, `Span`, and `Text`.
+- Package subpaths are explicitly enumerated.
+- Variables, cache keys, classes, and layers use Mystique names.
+- The provider always receives `value={system}` and has no parallel legacy theme
+  mode.
+- The factory uses lower-level Emotion primitives without a runtime dependency
+  on `@emotion/styled`.
+- React 19 and Next.js 15 through 16 SSR, hydration, RSC, and streaming are
+  explicit compatibility targets.
+- Chakra-specific interactive components, color-mode components, integrations,
+  recipes, and tokens stay out of scope.
+
+See the repository's `UPSTREAM.md` and `THIRD_PARTY_NOTICES.md` files for the
+complete source mapping and license record.

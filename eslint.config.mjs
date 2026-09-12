@@ -1,8 +1,8 @@
-import js from '@eslint/js'
-import tsParser from '@typescript-eslint/parser'
-import tsPlugin from '@typescript-eslint/eslint-plugin'
-import react from 'eslint-plugin-react'
-import reactHooks from 'eslint-plugin-react-hooks'
+import js from '@eslint/js';
+import tsPlugin from '@typescript-eslint/eslint-plugin';
+import tsParser from '@typescript-eslint/parser';
+import react from 'eslint-plugin-react';
+import reactHooks from 'eslint-plugin-react-hooks';
 
 export default [
   {
@@ -10,7 +10,10 @@ export default [
       '**/dist/**',
       '**/node_modules/**',
       '**/.next/**',
+      '**/.docusaurus/**',
       '**/.turbo/**',
+      '**/playwright-report/**',
+      '**/test-results/**',
       '**/next-env.d.ts',
     ],
   },
@@ -20,9 +23,17 @@ export default [
     languageOptions: {
       parser: tsParser,
       parserOptions: { ecmaFeatures: { jsx: true }, sourceType: 'module' },
-      globals: { console: 'readonly', document: 'readonly', window: 'readonly' },
+      globals: {
+        console: 'readonly',
+        document: 'readonly',
+        window: 'readonly',
+      },
     },
-    plugins: { '@typescript-eslint': tsPlugin, react, 'react-hooks': reactHooks },
+    plugins: {
+      '@typescript-eslint': tsPlugin,
+      react,
+      'react-hooks': reactHooks,
+    },
     settings: { react: { version: '19.0' } },
     rules: {
       ...tsPlugin.configs.recommended.rules,
@@ -30,8 +41,14 @@ export default [
       ...reactHooks.configs.recommended.rules,
       'react/react-in-jsx-scope': 'off',
       'no-undef': 'off',
-      '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
+      '@typescript-eslint/no-unused-vars': [
+        'error',
+        { argsIgnorePattern: '^_' },
+      ],
     },
   },
-  { files: ['**/*.{js,mjs}'], languageOptions: { ecmaVersion: 'latest', sourceType: 'module' } },
-]
+  {
+    files: ['**/*.{js,mjs}'],
+    languageOptions: { ecmaVersion: 'latest', sourceType: 'module' },
+  },
+];

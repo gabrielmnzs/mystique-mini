@@ -1,0 +1,28 @@
+{
+  "arrowParens": "always",
+  "bracketSpacing": true,
+  "endOfLine": "lf",
+  "importOrder": [
+    "<BUILTIN_MODULES>",
+    "<SEPARATOR>",
+    "^react(?:-dom)?(?:/.*)?$",
+    "^next(?:/.*)?$",
+    "<THIRD_PARTY_MODULES>",
+    "<SEPARATOR>",
+    "^(?:mystique-mini-react|@site)(?:/.*)?$",
+    "<SEPARATOR>",
+    "^[./]"
+  ],
+  "importOrderParserPlugins": ["typescript", "jsx"],
+  "importOrderSeparation": true,
+  "importOrderSideEffects": false,
+  "importOrderSortSpecifiers": true,
+  "jsxSingleQuote": false,
+  "plugins": ["@trivago/prettier-plugin-sort-imports"],
+  "printWidth": 80,
+  "proseWrap": "always",
+  "semi": true,
+  "singleQuote": true,
+  "tabWidth": 2,
+  "trailingComma": "all"
+}

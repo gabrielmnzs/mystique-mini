@@ -1,5 +1,5 @@
-import { defineConfig } from './config'
-import { defaultUtilityConfig } from './default-utilities'
+import { defineConfig } from './config';
+import { defaultUtilityConfig } from './default-utilities';
 
 export const defaultBaseConfig = defineConfig({
   cssVarsPrefix: 'mystique',
@@ -12,7 +12,8 @@ export const defaultBaseConfig = defineConfig({
     _focus: '&:is(:focus, [data-focus])',
     _focusVisible: '&:is(:focus-visible, [data-focus-visible])',
     _focusWithin: '&:focus-within',
-    _disabled: '&:is(:disabled, [disabled], [data-disabled], [aria-disabled=true])',
+    _disabled:
+      '&:is(:disabled, [disabled], [data-disabled], [aria-disabled=true])',
     _readOnly: '&:is([data-readonly], [aria-readonly=true], [readonly])',
     _invalid: '&:is([data-invalid], [aria-invalid=true])',
     _checked: '&:is(:checked, [data-checked], [aria-checked=true])',
@@ -32,4 +33,4 @@ export const defaultBaseConfig = defineConfig({
     _landscape: '@media (orientation: landscape)',
   },
   utilities: defaultUtilityConfig,
-})
+});

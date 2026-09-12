@@ -1,0 +1,46 @@
+---
+title: Polymorphism
+description:
+  Change the rendered element with as or compose a single child with asChild.
+---
+
+Use `as` when the component itself should render a different intrinsic element.
+The resulting props follow that target.
+
+```tsx
+import { Box, Text } from 'mystique-mini-react';
+
+export function ArticleLink() {
+  return (
+    <Text as="a" href="/article" color="blue.400">
+      Read the article
+    </Text>
+  );
+}
+
+export function Region() {
+  return <Box as="section" aria-labelledby="region-title" />;
+}
+```
+
+Use `asChild` to merge Mystique behavior into exactly one valid React element.
+
+```tsx
+<Box asChild color="blue.400" _hover={{ color: 'blue.300' }}>
+  <a href="/settings">Settings</a>
+</Box>
+```
+
+The child remains the rendered node. Its ref, class name, event handlers, and
+attributes are composed with the factory component.
+
+Some HTML attributes collide with style prop names. Use the explicit HTML escape
+prop when the DOM attribute is intended, such as `htmlColor`, `htmlSize`,
+`htmlWidth`, or `htmlHeight`.
+
+```tsx
+<Box as="input" type="text" htmlSize={24} />
+```
+
+Choose semantic markup first. Polymorphism changes the element, but it does not
+add keyboard behavior or ARIA semantics for you.

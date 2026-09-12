@@ -21,10 +21,10 @@ const manifest = {
     hydrationCountAfterClick: 1,
     streamOrder: ['streaming-fallback', 'streaming-resolved'],
   },
-} as const
+} as const;
 
 export function GET() {
   return Response.json(manifest, {
     headers: { 'x-mystique-smoke': 'next15-smoke' },
-  })
+  });
 }

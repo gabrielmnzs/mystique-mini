@@ -1,0 +1,48 @@
+---
+title: Semantic tokens
+description:
+  Map stable intent names to primitive tokens across color modes and
+  breakpoints.
+---
+
+Semantic tokens separate component intent from a specific palette value. Their
+values may be a base reference or an object keyed by system conditions.
+
+```ts
+import { defineSemanticTokens } from 'mystique-mini-react';
+
+const semanticTokens = defineSemanticTokens({
+  colors: {
+    canvas: {
+      value: {
+        base: '{colors.white}',
+        _dark: '{colors.gray.950}',
+      },
+    },
+    action: {
+      value: {
+        base: '{colors.blue.600}',
+        _dark: '{colors.blue.400}',
+      },
+    },
+  },
+});
+```
+
+Use the semantic path like any other color token.
+
+```tsx
+import { Box } from 'mystique-mini-react';
+
+export function Surface() {
+  return (
+    <Box bg="canvas" color="action" p="4">
+      Semantic surface
+    </Box>
+  );
+}
+```
+
+Responsive semantic values are emitted in canonical condition order: base first,
+then ascending breakpoints. This keeps overrides stable even when keys were
+authored in a different object order.
