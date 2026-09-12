@@ -1,0 +1,42 @@
+---
+title: SVA
+description: Compile coordinated styles for named component slots.
+---
+
+`system.sva` is the slot counterpart to `cva`. Its result contains one resolved
+style object per declared slot.
+
+```ts
+const alert = system.sva({
+  slots: ['root', 'title', 'description'],
+  base: {
+    root: { border: 'thin', borderColor: 'gray.700', p: '4' },
+    title: { fontWeight: 'bold' },
+    description: { color: 'muted' },
+  },
+  variants: {
+    compact: {
+      true: {
+        root: { p: '3' },
+        description: { fontSize: 'sm' },
+      },
+    },
+  },
+  defaultVariants: { compact: false },
+});
+
+const styles = alert({ compact: { base: true, md: false } });
+```
+
+Apply each returned object to the matching element through `css`.
+
+```tsx
+<Box css={styles.root}>
+  <Text css={styles.title}>Connection restored</Text>
+  <Text css={styles.description}>All queued changes were synchronized.</Text>
+</Box>
+```
+
+Slot recipes also support compound variants and `splitVariantProps`.
+
+<SlotRecipePreview />

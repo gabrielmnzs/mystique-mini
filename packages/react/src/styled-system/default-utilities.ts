@@ -1,30 +1,29 @@
-import type { CssValue, UtilityConfig, UtilityDefinition } from './types'
+import type { CssValue, UtilityConfig, UtilityDefinition } from './types';
 
 const define = (
   property?: string | readonly string[],
   values?: string,
-): UtilityDefinition => ({ property, values })
+): UtilityDefinition => ({ property, values });
 
-const spacing = (property?: string | readonly string[]) => define(property, 'spacing')
-const color = (property?: string | readonly string[]) => define(property, 'colors')
+const spacing = (property?: string | readonly string[]) =>
+  define(property, 'spacing');
+const color = (property?: string | readonly string[]) =>
+  define(property, 'colors');
 
 const sizing = (property: string | readonly string[]): UtilityDefinition => ({
   property,
   transform(value, { token }) {
-    const missing = '__mystique_missing_token__'
-    const sized = token(`sizes.${String(value)}`, missing)
-    const resolved = sized === missing
-      ? token(`spacing.${String(value)}`, value)
-      : sized
-    const properties = Array.isArray(property) ? property : [property]
-    return Object.fromEntries(properties.map((name) => [name, resolved]))
+    const missing = '__mystique_missing_token__';
+    const sized = token(`sizes.${String(value)}`, missing);
+    const resolved =
+      sized === missing ? token(`spacing.${String(value)}`, value) : sized;
+    const properties = Array.isArray(property) ? property : [property];
+    return Object.fromEntries(properties.map((name) => [name, resolved]));
   },
-})
+});
 
-const properties = (
-  names: readonly string[],
-  values?: string,
-): UtilityConfig => Object.fromEntries(names.map((name) => [name, define(name, values)]))
+const properties = (names: readonly string[], values?: string): UtilityConfig =>
+  Object.fromEntries(names.map((name) => [name, define(name, values)]));
 
 export const defaultUtilityConfig: UtilityConfig = {
   m: spacing('margin'),
@@ -36,11 +35,22 @@ export const defaultUtilityConfig: UtilityConfig = {
   my: spacing(['marginTop', 'marginBottom']),
   marginX: spacing(['marginLeft', 'marginRight']),
   marginY: spacing(['marginTop', 'marginBottom']),
-  ...properties([
-    'margin', 'marginTop', 'marginRight', 'marginBottom', 'marginLeft',
-    'marginInline', 'marginInlineStart', 'marginInlineEnd', 'marginBlock',
-    'marginBlockStart', 'marginBlockEnd',
-  ], 'spacing'),
+  ...properties(
+    [
+      'margin',
+      'marginTop',
+      'marginRight',
+      'marginBottom',
+      'marginLeft',
+      'marginInline',
+      'marginInlineStart',
+      'marginInlineEnd',
+      'marginBlock',
+      'marginBlockStart',
+      'marginBlockEnd',
+    ],
+    'spacing',
+  ),
 
   p: spacing('padding'),
   pt: spacing('paddingTop'),
@@ -51,11 +61,22 @@ export const defaultUtilityConfig: UtilityConfig = {
   py: spacing(['paddingTop', 'paddingBottom']),
   paddingX: spacing(['paddingLeft', 'paddingRight']),
   paddingY: spacing(['paddingTop', 'paddingBottom']),
-  ...properties([
-    'padding', 'paddingTop', 'paddingRight', 'paddingBottom', 'paddingLeft',
-    'paddingInline', 'paddingInlineStart', 'paddingInlineEnd', 'paddingBlock',
-    'paddingBlockStart', 'paddingBlockEnd',
-  ], 'spacing'),
+  ...properties(
+    [
+      'padding',
+      'paddingTop',
+      'paddingRight',
+      'paddingBottom',
+      'paddingLeft',
+      'paddingInline',
+      'paddingInlineStart',
+      'paddingInlineEnd',
+      'paddingBlock',
+      'paddingBlockStart',
+      'paddingBlockEnd',
+    ],
+    'spacing',
+  ),
 
   w: sizing('width'),
   h: sizing('height'),
@@ -75,8 +96,17 @@ export const defaultUtilityConfig: UtilityConfig = {
   insetY: spacing(['top', 'bottom']),
   ...properties(['inset', 'top', 'right', 'bottom', 'left'], 'spacing'),
   ...properties([
-    'display', 'position', 'overflow', 'overflowX', 'overflowY', 'visibility',
-    'float', 'isolation', 'objectFit', 'objectPosition', 'boxSizing',
+    'display',
+    'position',
+    'overflow',
+    'overflowX',
+    'overflowY',
+    'visibility',
+    'float',
+    'isolation',
+    'objectFit',
+    'objectPosition',
+    'boxSizing',
   ]),
   zIndex: define('zIndex', 'zIndex'),
   aspectRatio: define('aspectRatio', 'aspectRatios'),
@@ -89,9 +119,21 @@ export const defaultUtilityConfig: UtilityConfig = {
   grow: define('flexGrow'),
   shrink: define('flexShrink'),
   ...properties([
-    'alignItems', 'alignContent', 'alignSelf', 'justifyContent', 'justifyItems',
-    'justifySelf', 'placeItems', 'placeContent', 'placeSelf', 'flexDirection',
-    'flexWrap', 'flex', 'flexGrow', 'flexShrink', 'order',
+    'alignItems',
+    'alignContent',
+    'alignSelf',
+    'justifyContent',
+    'justifyItems',
+    'justifySelf',
+    'placeItems',
+    'placeContent',
+    'placeSelf',
+    'flexDirection',
+    'flexWrap',
+    'flex',
+    'flexGrow',
+    'flexShrink',
+    'order',
   ]),
   flexBasis: define('flexBasis', 'sizes'),
   gap: spacing('gap'),
@@ -99,9 +141,16 @@ export const defaultUtilityConfig: UtilityConfig = {
   columnGap: spacing('columnGap'),
 
   ...properties([
-    'gridArea', 'gridColumn', 'gridRow', 'gridAutoFlow', 'gridAutoColumns',
-    'gridAutoRows', 'gridTemplateColumns', 'gridTemplateRows',
-    'gridTemplateAreas', 'columnCount',
+    'gridArea',
+    'gridColumn',
+    'gridRow',
+    'gridAutoFlow',
+    'gridAutoColumns',
+    'gridAutoRows',
+    'gridTemplateColumns',
+    'gridTemplateRows',
+    'gridTemplateAreas',
+    'columnCount',
   ]),
 
   fontFamily: define('fontFamily', 'fonts'),
@@ -111,9 +160,18 @@ export const defaultUtilityConfig: UtilityConfig = {
   letterSpacing: define('letterSpacing', 'letterSpacings'),
   textDecorationColor: color('textDecorationColor'),
   ...properties([
-    'font', 'fontStyle', 'textAlign', 'textDecoration', 'textTransform',
-    'textOverflow', 'textIndent', 'whiteSpace', 'wordBreak', 'overflowWrap',
-    'textRendering', 'WebkitTextSizeAdjust',
+    'font',
+    'fontStyle',
+    'textAlign',
+    'textDecoration',
+    'textTransform',
+    'textOverflow',
+    'textIndent',
+    'whiteSpace',
+    'wordBreak',
+    'overflowWrap',
+    'textRendering',
+    'WebkitTextSizeAdjust',
   ]),
 
   color: color('color'),
@@ -122,8 +180,12 @@ export const defaultUtilityConfig: UtilityConfig = {
   background: color('background'),
   backgroundColor: color('backgroundColor'),
   ...properties([
-    'backgroundImage', 'backgroundSize', 'backgroundPosition',
-    'backgroundRepeat', 'backgroundClip', 'opacity',
+    'backgroundImage',
+    'backgroundSize',
+    'backgroundPosition',
+    'backgroundRepeat',
+    'backgroundClip',
+    'opacity',
   ]),
 
   border: define('border', 'borders'),
@@ -140,24 +202,46 @@ export const defaultUtilityConfig: UtilityConfig = {
   rounded: define('borderRadius', 'radii'),
   borderRadius: define('borderRadius', 'radii'),
   roundedTop: define(['borderTopLeftRadius', 'borderTopRightRadius'], 'radii'),
-  roundedBottom: define(['borderBottomLeftRadius', 'borderBottomRightRadius'], 'radii'),
+  roundedBottom: define(
+    ['borderBottomLeftRadius', 'borderBottomRightRadius'],
+    'radii',
+  ),
   outlineColor: color('outlineColor'),
   ...properties([
-    'borderStyle', 'borderTop', 'borderRight', 'borderBottom', 'borderLeft',
-    'outline', 'outlineOffset',
+    'borderStyle',
+    'borderTop',
+    'borderRight',
+    'borderBottom',
+    'borderLeft',
+    'outline',
+    'outlineOffset',
   ]),
 
   shadow: define('boxShadow', 'shadows'),
   boxShadow: define('boxShadow', 'shadows'),
   ...properties([
-    'textShadow', 'filter', 'backdropFilter', 'mixBlendMode', 'cursor',
-    'pointerEvents', 'resize', 'userSelect', 'transform', 'transformOrigin',
-    'translate', 'rotate', 'scale', 'transition', 'transitionProperty',
-    'transitionDuration', 'transitionTimingFunction', 'animation',
+    'textShadow',
+    'filter',
+    'backdropFilter',
+    'mixBlendMode',
+    'cursor',
+    'pointerEvents',
+    'resize',
+    'userSelect',
+    'transform',
+    'transformOrigin',
+    'translate',
+    'rotate',
+    'scale',
+    'transition',
+    'transitionProperty',
+    'transitionDuration',
+    'transitionTimingFunction',
+    'animation',
   ]),
-}
+};
 export function createUtilityTokenResolver(
   token: (path: string, fallback?: CssValue) => CssValue,
 ) {
-  return token
+  return token;
 }

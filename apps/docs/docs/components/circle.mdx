@@ -1,0 +1,25 @@
+---
+title: Circle
+description: A centered square primitive with a full border radius.
+---
+
+```tsx
+import { Circle } from 'mystique-mini-react';
+```
+
+`Circle` maps `size` to equal width and height, centers its child, and applies
+the `full` radius token.
+
+```tsx
+export function StatusDot() {
+  return (
+    <Circle bg="blue.400" color="gray.950" size="10">
+      3
+    </Circle>
+  );
+}
+```
+
+The component is a `div`, not a button or status role. Add an appropriate
+element through `as` and supply the required behavior when the circle is
+interactive or conveys meaning.

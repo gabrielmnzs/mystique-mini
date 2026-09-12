@@ -1,0 +1,51 @@
+---
+title: Accessibility
+description:
+  Apply semantic HTML, keyboard behavior, contrast, focus, and reduced-motion
+  requirements to primitives.
+---
+
+Mystique primitives provide styling, not application behavior. Accessibility
+remains part of the component you build.
+
+## Choose the element first
+
+Use a native element that matches the action or content. A visual `Circle` is
+still a `div`; styling it like a control does not make it keyboard accessible.
+Prefer a real `button` for an action and a real `a` for navigation.
+
+```tsx
+import { Box } from 'mystique-mini-react';
+
+export function SaveButton() {
+  return (
+    <Box
+      as="button"
+      type="button"
+      bg="blue.600"
+      color="white"
+      px="4"
+      py="2"
+      rounded="lg"
+      _focusVisible={{ outline: '2px solid', outlineColor: 'blue.400' }}
+    >
+      Save
+    </Box>
+  );
+}
+```
+
+## Keep behavior intact
+
+- Preserve visible focus and a logical focus order.
+- Give icon-only controls an accessible name.
+- Reflect disabled, invalid, expanded, selected, and checked state with native
+  attributes or appropriate ARIA.
+- Check text and non-text contrast in every semantic-token condition.
+- Place motion behind `prefers-reduced-motion` or override it with
+  `_motionReduce`.
+- Test keyboard, screen reader, zoom, forced-colors, and hydration behavior in
+  the consuming application.
+
+The documentation smoke test runs axe against representative routes, but
+automated analysis is only one part of accessibility verification.

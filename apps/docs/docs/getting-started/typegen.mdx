@@ -1,0 +1,38 @@
+---
+title: Type generation
+description:
+  Generate deterministic token, condition, recipe, slot, and utility
+  augmentations.
+---
+
+The package ships a `mystique-typegen` binary. Point it at a TypeScript or
+JavaScript module that exports a system, a config, or a default config value.
+
+```bash
+pnpm exec mystique-typegen ./src/system.ts ./src/mystique.generated.d.ts
+```
+
+Commit the generated declaration and include it in the application's TypeScript
+project. Run the command in CI and fail on a dirty diff to keep authored
+configuration and editor completions synchronized.
+
+```bash
+pnpm exec mystique-typegen ./src/system.ts ./src/mystique.generated.d.ts
+git diff --exit-code -- src/mystique.generated.d.ts
+```
+
+For programmatic tooling, import the pure generator from its dedicated entry
+point.
+
+```ts
+import { generateTypegen } from 'mystique-mini-react/typegen';
+
+import { system } from './system';
+
+const declaration = generateTypegen(system, {
+  moduleName: 'mystique-mini-react',
+});
+```
+
+The output is deterministic for a stable system. Regenerate it whenever tokens,
+conditions, utilities, recipes, slot recipes, or breakpoints change.

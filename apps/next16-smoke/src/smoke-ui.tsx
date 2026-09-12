@@ -1,14 +1,15 @@
-'use client'
+'use client';
 
-import { useState, type ReactNode } from 'react'
-import { Box, Flex, Text } from '@gabrielmnzs/mystique-react'
+import { type ReactNode, useState } from 'react';
 
-type FixtureName = 'next15' | 'next16'
-type HydrationScope = 'app' | 'pages'
+import { Box, Flex, Text } from 'mystique-mini-react';
+
+type FixtureName = 'next15' | 'next16';
+type HydrationScope = 'app' | 'pages';
 
 function HydrationProbe({ scope }: { scope: HydrationScope }) {
-  const [count, setCount] = useState(0)
-  const hydrated = count > 0
+  const [count, setCount] = useState(0);
+  const hydrated = count > 0;
 
   return (
     <Box
@@ -29,31 +30,46 @@ function HydrationProbe({ scope }: { scope: HydrationScope }) {
     >
       {scope} hydrated interaction: {count}
     </Box>
-  )
+  );
 }
 
 function RouterLinks() {
   return (
     <Flex as="nav" gap={4} wrap="wrap" aria-label="Smoke fixture routes">
-      <Box as="a" href="/" color="accent" _hover={{ textDecoration: 'underline' }}>
+      <Box
+        as="a"
+        href="/"
+        color="accent"
+        _hover={{ textDecoration: 'underline' }}
+      >
         App Router
       </Box>
-      <Box as="a" href="/streaming" color="accent" _hover={{ textDecoration: 'underline' }}>
+      <Box
+        as="a"
+        href="/streaming"
+        color="accent"
+        _hover={{ textDecoration: 'underline' }}
+      >
         Streaming
       </Box>
-      <Box as="a" href="/pages-smoke" color="accent" _hover={{ textDecoration: 'underline' }}>
+      <Box
+        as="a"
+        href="/pages-smoke"
+        color="accent"
+        _hover={{ textDecoration: 'underline' }}
+      >
         Pages Router
       </Box>
     </Flex>
-  )
+  );
 }
 
 function Surface({
   children,
   marker,
 }: {
-  children: ReactNode
-  marker: string
+  children: ReactNode;
+  marker: string;
 }) {
   return (
     <Box
@@ -77,15 +93,15 @@ function Surface({
         {children}
       </Box>
     </Box>
-  )
+  );
 }
 
 export function AppRouterSurface({
   fixture,
   presetMarker,
 }: {
-  fixture: FixtureName
-  presetMarker: string
+  fixture: FixtureName;
+  presetMarker: string;
 }) {
   return (
     <Surface marker="app-router-ssr">
@@ -100,7 +116,7 @@ export function AppRouterSurface({
         <RouterLinks />
       </Flex>
     </Surface>
-  )
+  );
 }
 
 export function StreamedSurface({ fixture }: { fixture: FixtureName }) {
@@ -120,15 +136,15 @@ export function StreamedSurface({ fixture }: { fixture: FixtureName }) {
       <Text as="h2">Streamed Mystique segment resolved</Text>
       <HydrationProbe scope="app" />
     </Box>
-  )
+  );
 }
 
 export function PagesRouterSurface({
   fixture,
   ssrMarker,
 }: {
-  fixture: FixtureName
-  ssrMarker: string
+  fixture: FixtureName;
+  ssrMarker: string;
 }) {
   return (
     <Surface marker="pages-router-ssr">
@@ -143,5 +159,5 @@ export function PagesRouterSurface({
         <RouterLinks />
       </Flex>
     </Surface>
-  )
+  );
 }

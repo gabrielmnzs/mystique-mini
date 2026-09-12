@@ -1,0 +1,48 @@
+---
+title: Slot recipes
+description: Store and retrieve coordinated multi-part component styles.
+---
+
+`defineSlotRecipe` describes a fixed set of slots plus shared variants.
+
+```ts
+import { defineConfig, defineSlotRecipe } from 'mystique-mini-react';
+
+const field = defineSlotRecipe({
+  slots: ['root', 'label', 'control', 'hint'],
+  base: {
+    root: { display: 'grid', gap: '2' },
+    label: { fontWeight: 'semibold' },
+    control: { border: 'thin', borderColor: 'gray.700', rounded: 'md' },
+    hint: { color: 'muted', fontSize: 'sm' },
+  },
+  variants: {
+    invalid: {
+      true: {
+        control: { borderColor: 'red.500' },
+        hint: { color: 'red.500' },
+      },
+    },
+  },
+});
+
+export const config = defineConfig({
+  theme: { slotRecipes: { field } },
+});
+```
+
+Retrieve and compile the named definition from the system when building a
+component abstraction.
+
+```ts
+const recipe = system.getSlotRecipeFn('field');
+const styles = recipe?.({ invalid: true });
+```
+
+For local definitions, call `system.sva(field)` directly.
+`createSlotRecipeContext` is available for building provider and slot helpers
+around a configured recipe key, while `useSlotRecipe` reads the compiled recipe
+in a custom component.
+
+Keep slot names stable. They become both runtime object keys and generated type
+metadata.

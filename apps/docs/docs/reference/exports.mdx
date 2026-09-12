@@ -1,0 +1,36 @@
+---
+title: Public exports
+description:
+  The supported root and subpath export surface for Mystique Mini 0.2.
+---
+
+## Root entry
+
+`mystique-mini-react` is the React-facing entry point.
+
+| Group                   | Runtime exports                                                                                                                                   |
+| ----------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Components              | `Box`, `Flex`, `Center`, `Square`, `Circle`, `Span`, `Text`                                                                                       |
+| Factory                 | `mystique`                                                                                                                                        |
+| Provider                | `MystiqueProvider`, `useMystiqueContext`, `useSystemContext`, `MYSTIQUE_CACHE_KEY`                                                                |
+| Configuration           | `defineConfig`, `defineGlobalStyles`, `defineRecipe`, `defineSlotRecipe`, `defineTokens`, `defineSemanticTokens`, `defineUtility`, `mergeConfigs` |
+| System                  | `createSystem`, `defaultBaseConfig`, `defaultThemeConfig`, `defaultConfig`, `defaultSystem`, `defaultMystiqueSystem`, `system`                    |
+| Recipe contexts         | `createRecipeContext`, `createSlotRecipeContext`                                                                                                  |
+| Default-bound functions | `css`, `cva`, `sva`                                                                                                                               |
+| Type generation         | `generateTypegen`                                                                                                                                 |
+
+The root also exports the corresponding component, factory, config, system,
+style, recipe, slot recipe, utility, and typegen TypeScript types.
+
+## Subpaths
+
+| Entry                               | Purpose                                                                                                                           |
+| ----------------------------------- | --------------------------------------------------------------------------------------------------------------------------------- |
+| `mystique-mini-react/preset`        | Pure default config and system exports                                                                                            |
+| `mystique-mini-react/styled-system` | Lower-level breakpoints, conditions, dictionary, utility, normalize, serialize, CSS, CVA, SVA, layers, and preflight constructors |
+| `mystique-mini-react/next`          | `MystiqueNextProvider` and `MystiqueCacheProvider` for App Router streaming                                                       |
+| `mystique-mini-react/typegen`       | Pure `generateTypegen` entry and its types                                                                                        |
+| `mystique-mini-react/package.json`  | Package metadata                                                                                                                  |
+
+Only enumerated subpaths are supported. Internal source paths and generated
+implementation files are not public APIs.

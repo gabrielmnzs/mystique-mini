@@ -1,4 +1,4 @@
-import { defineConfig } from 'tsup'
+import { defineConfig } from 'tsup';
 
 export default defineConfig({
   entry: { 'typegen-cli': 'src/typegen-cli.ts' },
@@ -8,4 +8,4 @@ export default defineConfig({
   dts: false,
   sourcemap: true,
   clean: false,
-})
+});

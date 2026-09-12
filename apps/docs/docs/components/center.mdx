@@ -1,0 +1,30 @@
+---
+title: Center
+description: A div primitive that centers children on both flex axes.
+---
+
+```tsx
+import { Center } from 'mystique-mini-react';
+```
+
+`Center` renders a `div` with `display: flex`, `align-items: center`, and
+`justify-content: center`.
+
+```tsx
+export function EmptyState() {
+  return (
+    <Center minH="32" border="thin" borderColor="gray.700" rounded="lg">
+      No results
+    </Center>
+  );
+}
+```
+
+The component has no `inline` variant. Set `display="inline-flex"` explicitly
+when inline formatting is required.
+
+```tsx
+<Center display="inline-flex" boxSize="12">
+  A
+</Center>
+```

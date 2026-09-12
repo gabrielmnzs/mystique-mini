@@ -1,4 +1,4 @@
-export { generateTypegen } from './styled-system/typegen'
+export { generateTypegen } from './styled-system/typegen';
 export type {
   ConditionName,
   MystiqueTypegen,
@@ -10,4 +10,4 @@ export type {
   TokenName,
   TypegenOptions,
   UtilityName,
-} from './styled-system/typegen'
+} from './styled-system/typegen';

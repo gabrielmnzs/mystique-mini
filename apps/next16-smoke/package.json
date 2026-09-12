@@ -15,7 +15,7 @@
     "@emotion/cache": "^11.14.0",
     "@emotion/react": "^11.14.0",
     "@emotion/server": "^11.11.0",
-    "@gabrielmnzs/mystique-react": "workspace:*",
+    "mystique-mini-react": "workspace:*",
     "next": "16.3.4",
     "react": "^19.0.0",
     "react-dom": "^19.0.0"

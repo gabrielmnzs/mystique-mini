@@ -1,0 +1,45 @@
+---
+title: Mystique Mini
+description:
+  A focused React 19 component surface backed by a configurable styled-system
+  core.
+hide_title: true
+slug: /
+---
+
+<HomeIntro />
+
+## Why Mystique Mini
+
+Mystique Mini keeps the visible component catalog deliberately small while
+retaining the parts that make a design system useful: tokens, semantic tokens,
+responsive values, conditions, utilities, recipes, slot recipes, CSS layers, and
+polymorphism.
+
+The public primitives are exactly `Box`, `Flex`, `Center`, `Square`, `Circle`,
+`Span`, and `Text`. Build application-specific components with the factory and
+recipe APIs instead of waiting for a larger catalog.
+
+<PrimitivePreview />
+
+## Start with the system
+
+Every component reads one compiled system from `MystiqueProvider`. Create that
+value once, provide it near the application root, and keep design decisions in
+configuration rather than scattering literals through components.
+
+```tsx
+import { MystiqueProvider, createSystem } from 'mystique-mini-react';
+import { defaultConfig } from 'mystique-mini-react/preset';
+
+const system = createSystem(defaultConfig);
+
+export function App() {
+  return (
+    <MystiqueProvider value={system}>{/* application */}</MystiqueProvider>
+  );
+}
+```
+
+Continue with [installation and setup](./getting-started/) or inspect the
+[complete export map](./reference/exports/).

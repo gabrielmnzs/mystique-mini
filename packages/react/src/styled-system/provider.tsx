@@ -1,43 +1,41 @@
-'use client'
+'use client';
 
-import createCache, { type EmotionCache } from '@emotion/cache'
-import { CacheProvider, Global } from '@emotion/react'
-import {
-  createContext,
-  useContext,
-  useState,
-  type ReactNode,
-} from 'react'
-import { isSystemContext, type SystemContext } from './system'
-import { interopDefault } from './interop-default'
+import { type ReactNode, createContext, useContext, useState } from 'react';
+import createCache, { type EmotionCache } from '@emotion/cache';
+import { CacheProvider, Global } from '@emotion/react';
 
-export const MYSTIQUE_CACHE_KEY = 'mystique'
-const createEmotionCache = interopDefault(createCache)
+import { interopDefault } from './interop-default';
+import { type SystemContext, isSystemContext } from './system';
 
-const MystiqueContext = createContext<SystemContext | undefined>(undefined)
-MystiqueContext.displayName = 'MystiqueContext'
+export const MYSTIQUE_CACHE_KEY = 'mystique';
+const createEmotionCache = interopDefault(createCache);
+
+const MystiqueContext = createContext<SystemContext | undefined>(undefined);
+MystiqueContext.displayName = 'MystiqueContext';
 
 export interface MystiqueProviderProps {
-  children: ReactNode
+  children: ReactNode;
   /** Optional so framework registries can provide their capture-enabled cache. */
-  cache?: EmotionCache
-  value: SystemContext
+  cache?: EmotionCache;
+  value: SystemContext;
 }
 
 export function MystiqueProvider(props: MystiqueProviderProps) {
-  const { cache, children, value } = props
-  const [localCache] = useState(() => createEmotionCache({ key: MYSTIQUE_CACHE_KEY }))
-  const activeCache = cache ?? localCache
+  const { cache, children, value } = props;
+  const [localCache] = useState(() =>
+    createEmotionCache({ key: MYSTIQUE_CACHE_KEY }),
+  );
+  const activeCache = cache ?? localCache;
 
   if (!isSystemContext(value)) {
     throw new Error(
       '[mystique > provider] <MystiqueProvider> requires a Mystique SystemContext in its `value` prop.',
-    )
+    );
   }
   if (activeCache.key !== MYSTIQUE_CACHE_KEY) {
     throw new Error(
       `[mystique > provider] Emotion cache key must be "${MYSTIQUE_CACHE_KEY}"; received "${activeCache.key}".`,
-    )
+    );
   }
 
   return (
@@ -47,15 +45,15 @@ export function MystiqueProvider(props: MystiqueProviderProps) {
         {children}
       </MystiqueContext.Provider>
     </CacheProvider>
-  )
+  );
 }
 
 export function useMystiqueContext(): SystemContext {
-  const value = useContext(MystiqueContext)
+  const value = useContext(MystiqueContext);
   if (value === undefined) {
     throw new Error(
       '[mystique > context] useMystiqueContext must be used within <MystiqueProvider value={system}>.',
-    )
+    );
   }
-  return value
+  return value;
 }

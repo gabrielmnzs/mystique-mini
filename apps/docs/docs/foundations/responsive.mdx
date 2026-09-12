@@ -1,0 +1,36 @@
+---
+title: Responsive values
+description:
+  Express mobile-first values with breakpoint objects or compact arrays.
+---
+
+The default preset defines `sm`, `md`, `lg`, `xl`, and `2xl` in ascending order.
+Objects are explicit and are preferred when a value skips breakpoints.
+
+```tsx
+import { Flex } from 'mystique-mini-react';
+
+export function Layout() {
+  return (
+    <Flex
+      direction={{ base: 'column', md: 'row' }}
+      gap={{ base: '3', lg: '6' }}
+    />
+  );
+}
+```
+
+Arrays map by index to `base`, then each configured breakpoint.
+
+```tsx
+<Flex direction={['column', null, 'row']} gap={['2', '3', '4']} />
+```
+
+In the default preset, the third array item maps to `md`. Use `null` to leave a
+breakpoint unchanged.
+
+<ResponsivePreview />
+
+Breakpoint helpers expose `up`, `down`, and `only` queries from the compiled
+system. Generated condition names also include forms such as `smOnly`, `smDown`,
+and `smToMd`.

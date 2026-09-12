@@ -1,0 +1,24 @@
+---
+title: Components
+description:
+  Seven neutral React primitives that expose the same styled-system contract.
+---
+
+Mystique Mini intentionally exports seven components. They provide layout and
+text foundations without prescribing product-specific interaction patterns.
+
+| Component | Default element | Built-in behavior                     |
+| --------- | --------------- | ------------------------------------- |
+| `Box`     | `div`           | Neutral container                     |
+| `Flex`    | `div`           | `display: flex`                       |
+| `Center`  | `div`           | Flex centering on both axes           |
+| `Square`  | `div`           | Equal width and height through `size` |
+| `Circle`  | `div`           | Square sizing plus a full radius      |
+| `Span`    | `span`          | Native inline element                 |
+| `Text`    | `p`             | Configured `text` recipe              |
+
+<PrimitivePreview />
+
+All seven accept system style props, `css`, conditions, responsive values, `as`,
+`asChild`, native element props, and forwarded refs. Their defaults are
+intentionally small, so semantics remain the consumer's responsibility.

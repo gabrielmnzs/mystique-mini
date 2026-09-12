@@ -1,5 +1,5 @@
-'use client'
+'use client';
 
-import { mystique } from '../../styled-system/factory'
+import { mystique } from '../../styled-system/factory';
 
-export const Box = mystique('div', { className: 'mystique-box' })
+export const Box = mystique('div', { className: 'mystique-box' });

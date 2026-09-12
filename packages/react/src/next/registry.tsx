@@ -1,76 +1,77 @@
-'use client'
+'use client';
 
-import createCache, { type EmotionCache } from '@emotion/cache'
-import { CacheProvider } from '@emotion/react'
-import { useServerInsertedHTML } from 'next/navigation'
-import { Fragment, useState, type ReactNode } from 'react'
+import { Fragment, type ReactNode, useState } from 'react';
+import { useServerInsertedHTML } from 'next/navigation';
+import createCache, { type EmotionCache } from '@emotion/cache';
+import { CacheProvider } from '@emotion/react';
+
+import { interopDefault } from '../styled-system/interop-default';
 import {
   MYSTIQUE_CACHE_KEY,
   MystiqueProvider,
-} from '../styled-system/provider'
-import type { SystemContext } from '../styled-system/system'
-import { interopDefault } from '../styled-system/interop-default'
+} from '../styled-system/provider';
+import type { SystemContext } from '../styled-system/system';
 
 interface InsertedStyle {
-  name: string
-  isGlobal: boolean
+  name: string;
+  isGlobal: boolean;
 }
 
 interface Registry {
-  cache: EmotionCache
-  flush: () => InsertedStyle[]
+  cache: EmotionCache;
+  flush: () => InsertedStyle[];
 }
 
-const createEmotionCache = interopDefault(createCache)
+const createEmotionCache = interopDefault(createCache);
 
 function createRegistry(nonce?: string): Registry {
-  const cache = createEmotionCache({ key: MYSTIQUE_CACHE_KEY, nonce })
-  cache.compat = true
+  const cache = createEmotionCache({ key: MYSTIQUE_CACHE_KEY, nonce });
+  cache.compat = true;
 
-  const originalInsert = cache.insert
-  let inserted: InsertedStyle[] = []
+  const originalInsert = cache.insert;
+  let inserted: InsertedStyle[] = [];
 
   cache.insert = (...args) => {
-    const [selector, serialized] = args
+    const [selector, serialized] = args;
 
     if (cache.inserted[serialized.name] === undefined) {
       inserted.push({
         name: serialized.name,
         isGlobal: selector.length === 0,
-      })
+      });
     }
 
-    return originalInsert(...args)
-  }
+    return originalInsert(...args);
+  };
 
   const flush = () => {
-    const current = inserted
-    inserted = []
-    return current
-  }
+    const current = inserted;
+    inserted = [];
+    return current;
+  };
 
-  return { cache, flush }
+  return { cache, flush };
 }
 
 interface RegistryBoundaryProps {
-  children: (cache: EmotionCache) => ReactNode
-  nonce?: string
+  children: (cache: EmotionCache) => ReactNode;
+  nonce?: string;
 }
 
 function RegistryBoundary({ children, nonce }: RegistryBoundaryProps) {
-  const [{ cache, flush }] = useState(() => createRegistry(nonce))
+  const [{ cache, flush }] = useState(() => createRegistry(nonce));
 
   useServerInsertedHTML(() => {
-    const inserted = flush()
-    if (inserted.length === 0) return null
+    const inserted = flush();
+    if (inserted.length === 0) return null;
 
-    const globalStyles: ReactNode[] = []
-    const names: string[] = []
-    let styles = ''
+    const globalStyles: ReactNode[] = [];
+    const names: string[] = [];
+    let styles = '';
 
     for (const { name, isGlobal } of inserted) {
-      const css = cache.inserted[name]
-      if (typeof css !== 'string') continue
+      const css = cache.inserted[name];
+      if (typeof css !== 'string') continue;
 
       if (isGlobal) {
         globalStyles.push(
@@ -80,12 +81,12 @@ function RegistryBoundary({ children, nonce }: RegistryBoundaryProps) {
             data-emotion={`${cache.key}-global ${name}`}
             dangerouslySetInnerHTML={{ __html: css }}
           />,
-        )
-        continue
+        );
+        continue;
       }
 
-      names.push(name)
-      styles += css
+      names.push(name);
+      styles += css;
     }
 
     return (
@@ -99,15 +100,15 @@ function RegistryBoundary({ children, nonce }: RegistryBoundaryProps) {
           />
         )}
       </Fragment>
-    )
-  })
+    );
+  });
 
-  return <CacheProvider value={cache}>{children(cache)}</CacheProvider>
+  return <CacheProvider value={cache}>{children(cache)}</CacheProvider>;
 }
 
 export interface MystiqueCacheProviderProps {
-  children?: ReactNode
-  nonce?: string
+  children?: ReactNode;
+  nonce?: string;
 }
 
 /**
@@ -118,17 +119,13 @@ export function MystiqueCacheProvider({
   children,
   nonce,
 }: MystiqueCacheProviderProps) {
-  return (
-    <RegistryBoundary nonce={nonce}>
-      {() => children}
-    </RegistryBoundary>
-  )
+  return <RegistryBoundary nonce={nonce}>{() => children}</RegistryBoundary>;
 }
 
 export interface MystiqueNextProviderProps {
-  value: SystemContext
-  children?: ReactNode
-  nonce?: string
+  value: SystemContext;
+  children?: ReactNode;
+  nonce?: string;
 }
 
 /**
@@ -148,5 +145,5 @@ export function MystiqueNextProvider({
         </MystiqueProvider>
       )}
     </RegistryBoundary>
-  )
+  );
 }

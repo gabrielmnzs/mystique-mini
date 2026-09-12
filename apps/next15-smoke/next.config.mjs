@@ -1,7 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
-  transpilePackages: ['@gabrielmnzs/mystique-react'],
-}
+  transpilePackages: ['mystique-mini-react'],
+};
 
-export default nextConfig
+export default nextConfig;

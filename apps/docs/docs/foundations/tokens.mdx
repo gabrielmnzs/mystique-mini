@@ -1,0 +1,46 @@
+---
+title: Tokens
+description:
+  Define primitive design values and consume their generated CSS variables.
+---
+
+Token groups are nested objects whose leaves contain `value`. `defineTokens`
+preserves literal inference and returns the same object at runtime.
+
+```ts
+import { defineConfig, defineTokens } from 'mystique-mini-react';
+
+const tokens = defineTokens({
+  colors: {
+    ink: { value: '#09090b' },
+    action: { value: '#2563eb' },
+  },
+  spacing: {
+    compact: { value: '0.75rem' },
+  },
+});
+
+export const config = defineConfig({ theme: { tokens } });
+```
+
+Primitive leaves may also be normalized, but `{ value }` is the portable
+authored form and leaves room for token metadata.
+
+References inside token values use braces.
+
+```ts
+const tokens = defineTokens({
+  colors: {
+    blue: { value: '#2563eb' },
+    action: { value: '{colors.blue}' },
+  },
+});
+```
+
+The dictionary flattens paths deterministically and emits prefixed variables.
+Access a resolved reference with `system.token('colors.action')`, inspect
+metadata with `system.query.token('colors.action')`, or list a category with
+`system.query.tokens('colors')`.
+
+Breakpoints are also registered as `breakpoints.<name>` and
+`sizes.breakpoint-<name>` tokens.

@@ -39,8 +39,7 @@ SOFTWARE.
 ## Emotion
 
 - Project: Emotion
-- Published package dependencies: `@emotion/cache` and
-  `@emotion/is-prop-valid`
+- Published package dependencies: `@emotion/cache` and `@emotion/is-prop-valid`
 - Required peer dependency: `@emotion/react`
 - Source: <https://github.com/emotion-js/emotion>
 - License: MIT

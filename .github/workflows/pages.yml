@@ -1,0 +1,84 @@
+name: Documentation
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions: {}
+
+concurrency:
+  group: github-pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    name: Build and smoke test
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    permissions:
+      contents: read
+      pages: read
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v7
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          package-manager-cache: false
+
+      - name: Enable pinned pnpm through Corepack
+        run: |
+          corepack enable
+          corepack install --global pnpm@11.25.0
+          pnpm --version
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build Mystique package
+        run: pnpm --filter mystique-mini-react build:dist
+
+      - name: Check documentation content
+        run: pnpm --filter @gabrielmnzs/mystique-docs test:content
+
+      - name: Check documentation types
+        run: pnpm --filter @gabrielmnzs/mystique-docs check-types
+
+      - name: Build documentation
+        run: pnpm --filter @gabrielmnzs/mystique-docs build
+
+      - name: Install Chromium
+        run: |
+          pnpm --filter @gabrielmnzs/mystique-docs exec playwright install --with-deps chromium
+
+      - name: Run documentation smoke tests
+        run: pnpm --filter @gabrielmnzs/mystique-docs test:smoke:built
+
+      - name: Configure GitHub Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload GitHub Pages artifact
+        uses: actions/upload-pages-artifact@v4
+        with:
+          path: apps/docs/dist
+
+  deploy:
+    name: Deploy to GitHub Pages
+    if: github.ref == 'refs/heads/main'
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    permissions:
+      pages: write
+      id-token: write
+    steps:
+      - name: Deploy GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

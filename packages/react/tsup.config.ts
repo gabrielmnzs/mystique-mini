@@ -1,4 +1,4 @@
-import { defineConfig } from 'tsup'
+import { defineConfig } from 'tsup';
 
 export default defineConfig({
   entry: {
@@ -12,8 +12,13 @@ export default defineConfig({
   sourcemap: true,
   clean: true,
   external: [
-    'react', 'react-dom', 'react/jsx-runtime', 'react/jsx-dev-runtime',
-    '@emotion/cache', '@emotion/is-prop-valid', '@emotion/react',
+    'react',
+    'react-dom',
+    'react/jsx-runtime',
+    'react/jsx-dev-runtime',
+    '@emotion/cache',
+    '@emotion/is-prop-valid',
+    '@emotion/react',
     'next/navigation',
   ],
-})
+});

@@ -1,0 +1,27 @@
+---
+title: Span
+description: A native inline span with no display override.
+---
+
+```tsx
+import { Span } from 'mystique-mini-react';
+```
+
+`Span` preserves the browser's native inline display. It is useful for
+token-aware styling inside text without adding a block formatting context.
+
+```tsx
+export function Sentence() {
+  return (
+    <p>
+      Deploy status:{' '}
+      <Span color="blue.400" fontWeight="semibold">
+        ready
+      </Span>
+    </p>
+  );
+}
+```
+
+Set `display` yourself when the layout requires a different value. Mystique does
+not force `inline-block`.

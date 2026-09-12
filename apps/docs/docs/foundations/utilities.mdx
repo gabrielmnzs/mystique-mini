@@ -1,0 +1,45 @@
+---
+title: Utilities
+description:
+  Map component props to CSS properties, token categories, or custom transforms.
+---
+
+Utilities decide how style props become declarations. The default preset
+includes spacing, sizing, flex, grid, typography, color, border, and effect
+mappings.
+
+Create an application utility with `defineUtility` and add it under `utilities`.
+
+```ts
+import { defineConfig, defineUtility } from 'mystique-mini-react';
+
+const bleed = defineUtility({
+  transform(value, { token }) {
+    const space = token(`spacing.${String(value)}`, value);
+    return {
+      marginLeft: `calc(${space} * -1)`,
+      marginRight: `calc(${space} * -1)`,
+    };
+  },
+});
+
+export const config = defineConfig({ utilities: { bleed } });
+```
+
+The simpler `property` and `values` fields map directly to a CSS property and
+token category.
+
+```ts
+const config = defineConfig({
+  utilities: {
+    surfaceColor: defineUtility({
+      property: 'backgroundColor',
+      values: 'colors',
+    }),
+  },
+});
+```
+
+Custom utility names are available to the runtime property splitter. Run type
+generation after adding them so application code receives precise prop
+completions.

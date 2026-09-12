@@ -1,0 +1,61 @@
+---
+title: Getting started
+description:
+  Install Mystique Mini, create a system, and render the first styled primitive.
+---
+
+Mystique Mini targets React 19 and uses Emotion for runtime style insertion.
+Install the package and its React and Emotion peers in the consuming
+application.
+
+```bash
+pnpm add mystique-mini-react @emotion/react react react-dom
+```
+
+## Create a system
+
+Extend the default configuration with application tokens. Token leaves use the
+`{ value }` shape.
+
+```tsx title="src/system.ts"
+import { createSystem, defineConfig } from 'mystique-mini-react';
+import { defaultConfig } from 'mystique-mini-react/preset';
+
+const appConfig = defineConfig({
+  theme: {
+    tokens: {
+      colors: {
+        brand: { value: '#2563eb' },
+      },
+    },
+  },
+});
+
+export const system = createSystem(defaultConfig, appConfig);
+```
+
+## Provide and render
+
+`value` is required. It must be the frozen context returned by `createSystem`.
+
+```tsx title="src/App.tsx"
+import { Box, MystiqueProvider } from 'mystique-mini-react';
+
+import { system } from './system';
+
+export function App() {
+  return (
+    <MystiqueProvider value={system}>
+      <Box bg="brand" color="white" p="4" rounded="lg">
+        Ready
+      </Box>
+    </MystiqueProvider>
+  );
+}
+```
+
+:::tip Import `defaultConfig` from `mystique-mini-react/preset` when you want
+the supplied token scale, utilities, conditions, breakpoints, preflight, and
+`Text` recipe. :::
+
+Next, read [provider setup](./provider/) and [styling fundamentals](./styling/).

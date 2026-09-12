@@ -1,0 +1,32 @@
+---
+title: Text
+description: A paragraph primitive connected to the configured text recipe.
+---
+
+```tsx
+import { Text } from 'mystique-mini-react';
+```
+
+`Text` renders a `p` and reads the recipe named `text` from the active system.
+The default preset removes the paragraph margin.
+
+```tsx
+export function Description() {
+  return (
+    <Text color="muted" fontSize="sm" lineHeight="relaxed">
+      A compact component surface backed by the full styling pipeline.
+    </Text>
+  );
+}
+```
+
+Use `as` for another text element when its semantics fit.
+
+```tsx
+<Text as="figcaption" color="muted">
+  Build output at 14:32
+</Text>
+```
+
+When an application adds variants to `theme.recipes.text`, run type generation
+so those variant props are reflected in `TextProps`.

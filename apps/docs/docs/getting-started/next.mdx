@@ -1,0 +1,65 @@
+---
+title: Next.js
+description:
+  Integrate Mystique Mini with Next.js App Router streaming or Pages Router
+  Emotion SSR.
+---
+
+## App Router
+
+Put the Next provider and system creation in one client boundary. Server
+Components may render through that boundary without importing client-only
+component code themselves.
+
+```tsx title="app/mystique-provider.tsx"
+'use client';
+
+import type { ReactNode } from 'react';
+
+import { MystiqueNextProvider } from 'mystique-mini-react/next';
+import { defaultSystem } from 'mystique-mini-react/preset';
+
+export function MystiqueBoundary({ children }: { children: ReactNode }) {
+  return (
+    <MystiqueNextProvider value={defaultSystem}>
+      {children}
+    </MystiqueNextProvider>
+  );
+}
+```
+
+```tsx title="app/layout.tsx"
+import type { ReactNode } from 'react';
+
+import { MystiqueBoundary } from './mystique-provider';
+
+export default function RootLayout({ children }: { children: ReactNode }) {
+  return (
+    <html lang="en">
+      <body>
+        <MystiqueBoundary>{children}</MystiqueBoundary>
+      </body>
+    </html>
+  );
+}
+```
+
+`MystiqueNextProvider` uses `useServerInsertedHTML` to flush only the Emotion
+rules added by each streamed segment. Pass `nonce` when the application enforces
+a Content Security Policy nonce.
+
+## Pages Router
+
+Use the core `MystiqueProvider` in `_app.tsx`. Create an Emotion cache with the
+key `mystique`, pass it through an `emotionCache` page prop, and use
+`@emotion/server/create-instance` in `_document.tsx` to call
+`extractCriticalToChunks` on the rendered HTML. Append the extracted
+`<style data-emotion="mystique ...">` elements to `DocumentInitialProps.styles`.
+
+Do not use `MystiqueNextProvider` in the Pages Router. Its insertion hook
+belongs to the App Router.
+
+## Server-only imports
+
+Types use `import type`. The preset entry is safe for configuration work, while
+runtime components and providers belong behind the client boundary.

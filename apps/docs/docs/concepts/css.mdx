@@ -1,0 +1,37 @@
+---
+title: CSS function
+description:
+  Normalize and serialize typed style objects without rendering a component.
+---
+
+Every compiled system exposes `css`. It accepts style objects, falsey entries,
+and nested arrays, then returns the Emotion-compatible object used by the
+component factory.
+
+```ts
+import { createSystem } from 'mystique-mini-react';
+import { defaultConfig } from 'mystique-mini-react/preset';
+
+const system = createSystem(defaultConfig);
+
+const cardStyles = system.css(
+  { bg: 'gray.900', color: 'gray.50', p: '4' },
+  false,
+  [{ rounded: 'lg' }, { _hover: { bg: 'gray.800' } }],
+);
+```
+
+Responsive values, named conditions, nested selectors, at-rules, tokens, and
+custom properties use the same pipeline.
+
+```ts
+const styles = system.css({
+  px: { base: '3', md: '5' },
+  '& > code': { color: 'blue.400' },
+  '@supports (display: grid)': { display: 'grid' },
+});
+```
+
+The top-level `css`, `cva`, and `sva` exports are bound to `defaultSystem`.
+Prefer methods on your compiled system when custom configuration changes tokens,
+utilities, conditions, or recipes.

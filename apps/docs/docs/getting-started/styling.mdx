@@ -1,0 +1,51 @@
+---
+title: Styling
+description:
+  Apply system properties, conditional values, nested CSS, and the css prop.
+---
+
+Every primitive and factory component accepts typed style props. The default
+utilities map terse aliases such as `px`, `bg`, `rounded`, and `align` to CSS
+declarations and token categories.
+
+```tsx
+import { Box } from 'mystique-mini-react';
+
+export function Card() {
+  return (
+    <Box
+      bg="gray.900"
+      border="thin"
+      borderColor="gray.700"
+      color="gray.50"
+      p={{ base: '4', md: '6' }}
+      rounded="lg"
+      _hover={{ borderColor: 'blue.400' }}
+    >
+      Content
+    </Box>
+  );
+}
+```
+
+Use `css` for composed objects, custom properties, selectors, and at-rules.
+
+```tsx
+<Box
+  css={{
+    '--card-accent': 'colors.blue.400',
+    borderLeftColor: 'var(--card-accent)',
+    borderLeftWidth: '4px',
+    '& > strong': { color: 'blue.400' },
+    '@media (prefers-reduced-motion: no-preference)': {
+      transition: 'border-color 120ms ease',
+    },
+  }}
+/>
+```
+
+Style props and `css` are serialized through the same system. When both write
+the same declaration, component-level authored styles follow the factory recipe
+and participate in normal CSS cascade order.
+
+<ResponsivePreview />

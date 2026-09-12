@@ -1,36 +1,37 @@
-'use client'
+'use client';
 
-import emotionIsPropValid from '@emotion/is-prop-valid'
-import { ClassNames } from '@emotion/react'
-import * as React from 'react'
-import type { SystemContext } from './system'
-import type {
-  CvaFn,
-  SystemStyleObject,
-  SystemStyleObjectInput,
-} from './types'
+import * as React from 'react';
+import emotionIsPropValid from '@emotion/is-prop-valid';
+import { ClassNames } from '@emotion/react';
+
+import { mergeCvaStyles } from './cva';
 import type {
   JsxFactory,
   JsxFactoryOptions,
   RecipeInput,
   StyledFactoryFn,
-} from './factory.types'
-import { useMystiqueContext } from './provider'
-import { interopDefault } from './interop-default'
-import { mergeCvaStyles } from './cva'
+} from './factory.types';
+import { interopDefault } from './interop-default';
+import { useMystiqueContext } from './provider';
+import type { SystemContext } from './system';
+import type { CvaFn, SystemStyleObject, SystemStyleObjectInput } from './types';
 
 /**
  * Private transport used by recipe contexts for styles that have already gone
  * through the system serializer. It deliberately is not part of the public
  * component prop types or the styled-system barrel.
  */
-export const MYSTIQUE_RESOLVED_STYLES_PROP = '__mystiqueResolvedStyles'
+export const MYSTIQUE_RESOLVED_STYLES_PROP = '__mystiqueResolvedStyles';
 
-const isPropValid = interopDefault(emotionIsPropValid)
-const eventName = /^on[A-Z]/
+const isPropValid = interopDefault(emotionIsPropValid);
+const eventName = /^on[A-Z]/;
+// Intentionally retain the pre-rename registry key. Factories created by
+// `@gabrielmnzs/mystique-react` 0.2 and `mystique-mini-react` must be able to
+// unwrap each other's metadata when both package names are present during a
+// consumer migration.
 const FACTORY_METADATA = Symbol.for(
   '@gabrielmnzs/mystique-react/factory-metadata',
-)
+);
 const htmlPropMap = {
   dirName: 'dirname',
   htmlAlign: 'align',
@@ -43,28 +44,133 @@ const htmlPropMap = {
   htmlTranslate: 'translate',
   htmlWidth: 'width',
   htmlWrap: 'wrap',
-} as const
+} as const;
 
 // Emotion validates most React DOM names, but it neither tracks the final
 // `as`/`asChild` target nor every React 19 attribute. The explicit map is
 // authoritative for known HTML targets; custom elements and SVG fall back to
 // Emotion's syntax validation.
 const htmlTargets = new Set([
-  'a', 'abbr', 'address', 'area', 'article', 'aside', 'audio', 'b', 'base',
-  'bdi', 'bdo', 'big', 'blockquote', 'body', 'br', 'button', 'canvas',
-  'caption', 'center', 'cite', 'code', 'col', 'colgroup', 'data', 'datalist', 'dd', 'del',
-  'details', 'dfn', 'dialog', 'div', 'dl', 'dt', 'em', 'embed', 'fieldset',
-  'figcaption', 'figure', 'footer', 'form', 'h1', 'h2', 'h3', 'h4', 'h5',
-  'h6', 'head', 'header', 'hgroup', 'hr', 'html', 'i', 'iframe', 'img',
-  'input', 'ins', 'kbd', 'keygen', 'label', 'legend', 'li', 'link', 'main', 'map',
-  'mark', 'menu', 'menuitem', 'meta', 'meter', 'nav', 'noindex', 'noscript', 'object', 'ol',
-  'optgroup', 'option', 'output', 'p', 'param', 'picture', 'pre', 'progress', 'q',
-  'rp', 'rt', 'ruby', 's', 'samp', 'script', 'search', 'section', 'select',
-  'slot', 'small', 'source', 'span', 'strong', 'style', 'sub', 'summary',
-  'sup', 'table', 'tbody', 'td', 'template', 'textarea', 'tfoot', 'th',
-  'thead', 'time', 'title', 'tr', 'track', 'u', 'ul', 'var', 'video', 'wbr',
+  'a',
+  'abbr',
+  'address',
+  'area',
+  'article',
+  'aside',
+  'audio',
+  'b',
+  'base',
+  'bdi',
+  'bdo',
+  'big',
+  'blockquote',
+  'body',
+  'br',
+  'button',
+  'canvas',
+  'caption',
+  'center',
+  'cite',
+  'code',
+  'col',
+  'colgroup',
+  'data',
+  'datalist',
+  'dd',
+  'del',
+  'details',
+  'dfn',
+  'dialog',
+  'div',
+  'dl',
+  'dt',
+  'em',
+  'embed',
+  'fieldset',
+  'figcaption',
+  'figure',
+  'footer',
+  'form',
+  'h1',
+  'h2',
+  'h3',
+  'h4',
+  'h5',
+  'h6',
+  'head',
+  'header',
+  'hgroup',
+  'hr',
+  'html',
+  'i',
+  'iframe',
+  'img',
+  'input',
+  'ins',
+  'kbd',
+  'keygen',
+  'label',
+  'legend',
+  'li',
+  'link',
+  'main',
+  'map',
+  'mark',
+  'menu',
+  'menuitem',
+  'meta',
+  'meter',
+  'nav',
+  'noindex',
+  'noscript',
+  'object',
+  'ol',
+  'optgroup',
+  'option',
+  'output',
+  'p',
+  'param',
+  'picture',
+  'pre',
+  'progress',
+  'q',
+  'rp',
+  'rt',
+  'ruby',
+  's',
+  'samp',
+  'script',
+  'search',
+  'section',
+  'select',
+  'slot',
+  'small',
+  'source',
+  'span',
+  'strong',
+  'style',
+  'sub',
+  'summary',
+  'sup',
+  'table',
+  'tbody',
+  'td',
+  'template',
+  'textarea',
+  'tfoot',
+  'th',
+  'thead',
+  'time',
+  'title',
+  'tr',
+  'track',
+  'u',
+  'ul',
+  'var',
+  'video',
+  'wbr',
   'webview',
-])
+]);
 const targetSpecificProps: Readonly<Record<string, ReadonlySet<string>>> = {
   abbr: new Set(['td', 'th']),
   acceptCharset: new Set(['form']),
@@ -110,7 +216,13 @@ const targetSpecificProps: Readonly<Record<string, ReadonlySet<string>>> = {
   defer: new Set(['script']),
   dirname: new Set(['textarea']),
   disabled: new Set([
-    'button', 'fieldset', 'input', 'keygen', 'optgroup', 'option', 'select',
+    'button',
+    'fieldset',
+    'input',
+    'keygen',
+    'optgroup',
+    'option',
+    'select',
     'textarea',
   ]),
   disablePictureInPicture: new Set(['video']),
@@ -122,8 +234,16 @@ const targetSpecificProps: Readonly<Record<string, ReadonlySet<string>>> = {
   encType: new Set(['form']),
   fetchPriority: new Set(['img', 'link', 'script']),
   form: new Set([
-    'button', 'fieldset', 'input', 'keygen', 'label', 'meter', 'object',
-    'output', 'select', 'textarea',
+    'button',
+    'fieldset',
+    'input',
+    'keygen',
+    'label',
+    'meter',
+    'object',
+    'output',
+    'select',
+    'textarea',
   ]),
   formAction: new Set(['button', 'input']),
   formEncType: new Set(['button', 'input']),
@@ -192,8 +312,21 @@ const targetSpecificProps: Readonly<Record<string, ReadonlySet<string>>> = {
   multiple: new Set(['input', 'select']),
   muted: new Set(['audio', 'video']),
   name: new Set([
-    'button', 'details', 'fieldset', 'form', 'iframe', 'input', 'keygen', 'map',
-    'meta', 'object', 'output', 'param', 'select', 'slot', 'textarea',
+    'button',
+    'details',
+    'fieldset',
+    'form',
+    'iframe',
+    'input',
+    'keygen',
+    'map',
+    'meta',
+    'object',
+    'output',
+    'param',
+    'select',
+    'slot',
+    'textarea',
   ]),
   nodeintegration: new Set(['webview']),
   noModule: new Set(['script']),
@@ -234,8 +367,16 @@ const targetSpecificProps: Readonly<Record<string, ReadonlySet<string>>> = {
   sizes: new Set(['img', 'link', 'source']),
   span: new Set(['col', 'colgroup']),
   src: new Set([
-    'audio', 'embed', 'iframe', 'img', 'input', 'script', 'source', 'track',
-    'video', 'webview',
+    'audio',
+    'embed',
+    'iframe',
+    'img',
+    'input',
+    'script',
+    'source',
+    'track',
+    'video',
+    'webview',
   ]),
   srcLang: new Set(['track']),
   srcDoc: new Set(['iframe']),
@@ -245,14 +386,31 @@ const targetSpecificProps: Readonly<Record<string, ReadonlySet<string>>> = {
   summary: new Set(['table']),
   target: new Set(['a', 'area', 'base', 'form']),
   type: new Set([
-    'a', 'button', 'embed', 'input', 'link', 'menu', 'object', 'ol',
-    'script', 'source', 'style',
+    'a',
+    'button',
+    'embed',
+    'input',
+    'link',
+    'menu',
+    'object',
+    'ol',
+    'script',
+    'source',
+    'style',
   ]),
   useMap: new Set(['img', 'object']),
   useragent: new Set(['webview']),
   value: new Set([
-    'button', 'data', 'input', 'li', 'meter', 'option', 'param', 'progress',
-    'select', 'textarea',
+    'button',
+    'data',
+    'input',
+    'li',
+    'meter',
+    'option',
+    'param',
+    'progress',
+    'select',
+    'textarea',
   ]),
   width: new Set([
     'canvas',
@@ -271,7 +429,7 @@ const targetSpecificProps: Readonly<Record<string, ReadonlySet<string>>> = {
   webpreferences: new Set(['webview']),
   wmode: new Set(['object']),
   wrap: new Set(['textarea']),
-}
+};
 const internalProps = new Set([
   'as',
   'asChild',
@@ -281,32 +439,32 @@ const internalProps = new Set([
   'recipe',
   'ref',
   'unstyled',
-])
+]);
 
-type AnyProps = Record<string, unknown>
-type AnyRef = React.Ref<unknown>
+type AnyProps = Record<string, unknown>;
+type AnyRef = React.Ref<unknown>;
 
 interface FactoryLayer {
-  options: JsxFactoryOptions
-  recipe: RecipeInput
+  options: JsxFactoryOptions;
+  recipe: RecipeInput;
 }
 
 interface FactoryMetadata {
-  baseTarget: React.ElementType
-  layers: readonly FactoryLayer[]
+  baseTarget: React.ElementType;
+  layers: readonly FactoryLayer[];
 }
 
 interface ResolvedFactoryLayer extends FactoryLayer {
-  variantKeys: readonly string[]
+  variantKeys: readonly string[];
 }
 
 function getFactoryMetadata(
   target: React.ElementType,
 ): FactoryMetadata | undefined {
-  if (typeof target === 'string') return
+  if (typeof target === 'string') return;
   return (target as unknown as Record<PropertyKey, unknown>)[
     FACTORY_METADATA
-  ] as FactoryMetadata | undefined
+  ] as FactoryMetadata | undefined;
 }
 
 function isCvaFn(value: RecipeInput): value is CvaFn {
@@ -314,26 +472,26 @@ function isCvaFn(value: RecipeInput): value is CvaFn {
     typeof value === 'function' &&
     Array.isArray(value.variantKeys) &&
     typeof value.splitVariantProps === 'function'
-  )
+  );
 }
 
 function mergeDefined(
   defaults: Readonly<AnyProps> | undefined,
   props: Readonly<AnyProps>,
 ): AnyProps {
-  const result: AnyProps = { ...defaults }
+  const result: AnyProps = { ...defaults };
   for (const [key, value] of Object.entries(props)) {
-    if (value !== undefined) result[key] = value
+    if (value !== undefined) result[key] = value;
   }
-  return result
+  return result;
 }
 
 function mergeElementProps(parent: AnyProps, child: AnyProps): AnyProps {
-  const result: AnyProps = { ...parent }
+  const result: AnyProps = { ...parent };
 
   for (const [key, childValue] of Object.entries(child)) {
-    if (key === 'ref' || childValue === undefined) continue
-    const parentValue = result[key]
+    if (key === 'ref' || childValue === undefined) continue;
+    const parentValue = result[key];
 
     if (
       eventName.test(key) &&
@@ -341,10 +499,10 @@ function mergeElementProps(parent: AnyProps, child: AnyProps): AnyProps {
       typeof childValue === 'function'
     ) {
       result[key] = (...args: unknown[]) => {
-        parentValue(...args)
-        childValue(...args)
-      }
-      continue
+        parentValue(...args);
+        childValue(...args);
+      };
+      continue;
     }
 
     if (key === 'style') {
@@ -355,76 +513,80 @@ function mergeElementProps(parent: AnyProps, child: AnyProps): AnyProps {
         ...(typeof childValue === 'object' && childValue !== null
           ? childValue
           : {}),
-      }
-      continue
+      };
+      continue;
     }
 
-    result[key] = childValue
+    result[key] = childValue;
   }
 
-  return result
+  return result;
 }
 
 function assignRef(ref: AnyRef, value: unknown): void | (() => void) {
-  if (typeof ref === 'function') return ref(value)
+  if (typeof ref === 'function') return ref(value);
   if (ref !== null) {
-    ;(ref as React.MutableRefObject<unknown>).current = value
+    (ref as React.MutableRefObject<unknown>).current = value;
   }
 }
 
-const supportsRefCleanup = Number.parseInt(React.version, 10) >= 19
+const supportsRefCleanup = Number.parseInt(React.version, 10) >= 19;
 
-function mergeRefs(...refs: Array<AnyRef | undefined>): React.RefCallback<unknown> {
-  const available = refs.filter((ref): ref is AnyRef => ref != null)
+function mergeRefs(
+  ...refs: Array<AnyRef | undefined>
+): React.RefCallback<unknown> {
+  const available = refs.filter((ref): ref is AnyRef => ref != null);
 
   return (node) => {
     const cleanups = available.map((ref) => ({
       cleanup: assignRef(ref, node),
       ref,
-    }))
+    }));
 
-    if (!supportsRefCleanup) return
+    if (!supportsRefCleanup) return;
     return () => {
       for (const item of cleanups) {
-        if (typeof item.cleanup === 'function') item.cleanup()
-        else assignRef(item.ref, null)
+        if (typeof item.cleanup === 'function') item.cleanup();
+        else assignRef(item.ref, null);
       }
-    }
-  }
+    };
+  };
 }
 
-function getElementRef(element: React.ReactElement<AnyProps>): AnyRef | undefined {
-  if (supportsRefCleanup) return element.props.ref as AnyRef | undefined
-  return (element as unknown as { ref?: AnyRef }).ref
+function getElementRef(
+  element: React.ReactElement<AnyProps>,
+): AnyRef | undefined {
+  if (supportsRefCleanup) return element.props.ref as AnyRef | undefined;
+  return (element as unknown as { ref?: AnyRef }).ref;
 }
 
 function flattenCssInput(
   input: SystemStyleObjectInput | undefined,
   output: SystemStyleObject[] = [],
 ): SystemStyleObject[] {
-  if (!input) return output
+  if (!input) return output;
   if (Array.isArray(input)) {
-    for (const item of input) flattenCssInput(item, output)
-    return output
+    for (const item of input) flattenCssInput(item, output);
+    return output;
   }
-  if (typeof input === 'object') output.push(input as SystemStyleObject)
-  return output
+  if (typeof input === 'object') output.push(input as SystemStyleObject);
+  return output;
 }
 
 function targetAcceptsProp(target: React.ElementType, prop: string): boolean {
   if (typeof target === 'string') {
-    const targets = targetSpecificProps[prop]
-    if (targets && htmlTargets.has(target)) return targets.has(target)
-    return isPropValid(prop)
+    const targets = targetSpecificProps[prop];
+    if (targets && htmlTargets.has(target)) return targets.has(target);
+    return isPropValid(prop);
   }
-  return prop !== 'theme'
+  return prop !== 'theme';
 }
 
 function explicitlyForwardsProp(
   prop: string,
   layers: readonly ResolvedFactoryLayer[],
 ): boolean {
-  return layers.some((layer) => layer.options.forwardProps?.includes(prop))
+  return layers.some((layer) => layer.options.forwardProps?.includes(prop));
 }
 
 function optionLayersAcceptProp(
@@ -432,9 +594,11 @@ function optionLayersAcceptProp(
   target: React.ElementType,
   layers: readonly ResolvedFactoryLayer[],
 ): boolean {
-  return layers.every((layer) =>
-    layer.options.shouldForwardProp?.(prop, layer.variantKeys, target) ?? true,
-  )
+  return layers.every(
+    (layer) =>
+      layer.options.shouldForwardProp?.(prop, layer.variantKeys, target) ??
+      true,
+  );
 }
 
 function shouldForwardProp(
@@ -444,17 +608,17 @@ function shouldForwardProp(
   variantKeys: readonly string[],
   layers: readonly ResolvedFactoryLayer[],
 ): boolean {
-  const explicitlyForwarded = explicitlyForwardsProp(prop, layers)
+  const explicitlyForwarded = explicitlyForwardsProp(prop, layers);
   if (
     !explicitlyForwarded &&
     (internalProps.has(prop) ||
       variantKeys.includes(prop) ||
       system.isValidProperty(prop))
   ) {
-    return false
+    return false;
   }
-  if (!targetAcceptsProp(target, prop)) return false
-  return optionLayersAcceptProp(prop, target, layers)
+  if (!targetAcceptsProp(target, prop)) return false;
+  return optionLayersAcceptProp(prop, target, layers);
 }
 
 function filterParentProps(
@@ -464,23 +628,23 @@ function filterParentProps(
   variantKeys: readonly string[],
   layers: readonly ResolvedFactoryLayer[],
 ): AnyProps {
-  const result: AnyProps = {}
+  const result: AnyProps = {};
   for (const [key, value] of Object.entries(props)) {
-    const nativeProp = htmlPropMap[key as keyof typeof htmlPropMap]
+    const nativeProp = htmlPropMap[key as keyof typeof htmlPropMap];
     if (nativeProp) {
       if (
         targetAcceptsProp(target, nativeProp) &&
         optionLayersAcceptProp(nativeProp, target, layers)
       ) {
-        result[nativeProp] = value
+        result[nativeProp] = value;
       }
-      continue
+      continue;
     }
     if (shouldForwardProp(key, target, system, variantKeys, layers)) {
-      result[key] = value
+      result[key] = value;
     }
   }
-  return result
+  return result;
 }
 
 /**
@@ -493,29 +657,27 @@ function filterChildProps(
   props: AnyProps,
   target: React.ElementType,
 ): AnyProps {
-  const result: AnyProps = {}
+  const result: AnyProps = {};
   for (const [key, value] of Object.entries(props)) {
-    if (key === 'ref' || key === 'className') continue
+    if (key === 'ref' || key === 'className') continue;
 
     if (typeof target !== 'string') {
-      if (key !== 'theme') result[key] = value
-      continue
+      if (key !== 'theme') result[key] = value;
+      continue;
     }
 
-    const nativeProp = htmlPropMap[key as keyof typeof htmlPropMap]
+    const nativeProp = htmlPropMap[key as keyof typeof htmlPropMap];
     if (nativeProp) {
-      if (
-        targetAcceptsProp(target, nativeProp)
-      ) {
-        result[nativeProp] = value
+      if (targetAcceptsProp(target, nativeProp)) {
+        result[nativeProp] = value;
       }
-      continue
+      continue;
     }
     if (targetAcceptsProp(target, key)) {
-      result[key] = value
+      result[key] = value;
     }
   }
-  return result
+  return result;
 }
 
 function resolveRecipe(
@@ -523,17 +685,17 @@ function resolveRecipe(
   recipe: RecipeInput,
   cache: WeakMap<SystemContext, CvaFn>,
 ): CvaFn {
-  if (isCvaFn(recipe)) return recipe
-  const cached = cache.get(system)
-  if (cached) return cached
-  const value = system.cva(recipe)
-  cache.set(system, value)
-  return value
+  if (isCvaFn(recipe)) return recipe;
+  const cached = cache.get(system);
+  if (cached) return cached;
+  const value = system.cva(recipe);
+  cache.set(system, value);
+  return value;
 }
 
 function getDisplayName(target: React.ElementType): string {
-  if (typeof target === 'string') return target
-  return target.displayName || target.name || 'Component'
+  if (typeof target === 'string') return target;
+  return target.displayName || target.name || 'Component';
 }
 
 function createStyled(
@@ -544,194 +706,194 @@ function createStyled(
   if (baseTarget === undefined || baseTarget === null) {
     throw new Error(
       '[mystique > factory] Cannot create a styled element from an undefined target.',
-    )
+    );
   }
 
-  const inheritedMetadata = getFactoryMetadata(baseTarget)
+  const inheritedMetadata = getFactoryMetadata(baseTarget);
   const factoryMetadata: FactoryMetadata = Object.freeze({
     baseTarget: inheritedMetadata?.baseTarget ?? baseTarget,
     layers: Object.freeze([
       ...(inheritedMetadata?.layers ?? []),
       Object.freeze({ options, recipe }),
     ]),
-  })
+  });
   const recipeCaches = factoryMetadata.layers.map(
     () => new WeakMap<SystemContext, CvaFn>(),
-  )
+  );
   const defaultProps = factoryMetadata.layers.reduce<AnyProps>(
-    (result, layer) => mergeDefined(
-      result,
-      layer.options.defaultProps as AnyProps | undefined ?? {},
-    ),
+    (result, layer) =>
+      mergeDefined(
+        result,
+        (layer.options.defaultProps as AnyProps | undefined) ?? {},
+      ),
     {},
-  )
+  );
   const forwardedProps = new Set(
     factoryMetadata.layers.flatMap((layer) => layer.options.forwardProps ?? []),
-  )
+  );
 
-  const Styled = React.forwardRef<unknown, AnyProps>(function MystiqueStyled(
-    inputProps,
-    forwardedRef,
-  ) {
-    const system = useMystiqueContext()
-    const cvaRecipes = React.useMemo(
-      () => factoryMetadata.layers.map((layer, index) =>
-        resolveRecipe(system, layer.recipe, recipeCaches[index]!),
-      ),
-      [system],
-    )
-    const resolvedFactoryLayers = React.useMemo(
-      () => factoryMetadata.layers.map((layer, index) => ({
-        ...layer,
-        variantKeys: cvaRecipes[index]!.variantKeys,
-      })),
-      [cvaRecipes],
-    )
-    const props = mergeDefined(defaultProps, inputProps)
-    const variantKeys = React.useMemo(
-      () => [...new Set(cvaRecipes.flatMap((item) => item.variantKeys))],
-      [cvaRecipes],
-    )
-    const variantProps: AnyProps = {}
-    const styleProps: AnyProps = {}
-    const elementProps: AnyProps = {}
+  const Styled = React.forwardRef<unknown, AnyProps>(
+    function MystiqueStyled(inputProps, forwardedRef) {
+      const system = useMystiqueContext();
+      const cvaRecipes = React.useMemo(
+        () =>
+          factoryMetadata.layers.map((layer, index) =>
+            resolveRecipe(system, layer.recipe, recipeCaches[index]!),
+          ),
+        [system],
+      );
+      const resolvedFactoryLayers = React.useMemo(
+        () =>
+          factoryMetadata.layers.map((layer, index) => ({
+            ...layer,
+            variantKeys: cvaRecipes[index]!.variantKeys,
+          })),
+        [cvaRecipes],
+      );
+      const props = mergeDefined(defaultProps, inputProps);
+      const variantKeys = React.useMemo(
+        () =>
+          Array.from(new Set(cvaRecipes.flatMap((item) => item.variantKeys))),
+        [cvaRecipes],
+      );
+      const variantProps: AnyProps = {};
+      const styleProps: AnyProps = {};
+      const elementProps: AnyProps = {};
 
-    const as = props.as as React.ElementType | undefined
-    const asChild = props.asChild === true
-    const unstyled = props.unstyled === true
-    const inputClassName = props.className as string | undefined
-    const cssProp = props.css as SystemStyleObjectInput | undefined
-    const contextStyles = props[MYSTIQUE_RESOLVED_STYLES_PROP] as
-      | Record<string, unknown>
-      | undefined
-    const children = props.children as React.ReactNode
+      const as = props.as as React.ElementType | undefined;
+      const asChild = props.asChild === true;
+      const unstyled = props.unstyled === true;
+      const inputClassName = props.className as string | undefined;
+      const cssProp = props.css as SystemStyleObjectInput | undefined;
+      const contextStyles = props[MYSTIQUE_RESOLVED_STYLES_PROP] as
+        Record<string, unknown> | undefined;
+      const children = props.children as React.ReactNode;
 
-    for (const [key, value] of Object.entries(props)) {
-      if (internalProps.has(key) || key === 'children') continue
-      if (forwardedProps.has(key)) {
-        elementProps[key] = value
-      } else if (variantKeys.includes(key)) {
-        variantProps[key] = value
-      } else if (system.isValidProperty(key)) {
-        styleProps[key] = value
-      } else {
-        elementProps[key] = value
+      for (const [key, value] of Object.entries(props)) {
+        if (internalProps.has(key) || key === 'children') continue;
+        if (forwardedProps.has(key)) {
+          elementProps[key] = value;
+        } else if (variantKeys.includes(key)) {
+          variantProps[key] = value;
+        } else if (system.isValidProperty(key)) {
+          styleProps[key] = value;
+        } else {
+          elementProps[key] = value;
+        }
       }
-    }
 
-    const recipeStyles = unstyled
-      ? []
-      : cvaRecipes.map((item) =>
-          item(variantProps as Parameters<CvaFn>[0]),
-        )
-    const resolvedStyles = mergeCvaStyles(
-      ...recipeStyles,
-      contextStyles ?? {},
-      system.css(
-        ...flattenCssInput(cssProp),
-        styleProps as SystemStyleObject,
-      ),
-    )
+      const recipeStyles = unstyled
+        ? []
+        : cvaRecipes.map((item) => item(variantProps as Parameters<CvaFn>[0]));
+      const resolvedStyles = mergeCvaStyles(
+        ...recipeStyles,
+        contextStyles ?? {},
+        system.css(
+          ...flattenCssInput(cssProp),
+          styleProps as SystemStyleObject,
+        ),
+      );
 
-    let child: React.ReactElement<AnyProps> | undefined
-    let finalTarget = as ?? factoryMetadata.baseTarget
+      let child: React.ReactElement<AnyProps> | undefined;
+      let finalTarget = as ?? factoryMetadata.baseTarget;
 
-    if (asChild) {
-      let onlyChild: React.ReactNode
-      try {
-        onlyChild = React.Children.only(children)
-      } catch {
-        throw new Error(
-          '[mystique > factory] `asChild` requires exactly one valid React element.',
-        )
+      if (asChild) {
+        let onlyChild: React.ReactNode;
+        try {
+          onlyChild = React.Children.only(children);
+        } catch {
+          throw new Error(
+            '[mystique > factory] `asChild` requires exactly one valid React element.',
+          );
+        }
+        if (!React.isValidElement<AnyProps>(onlyChild)) {
+          throw new Error(
+            '[mystique > factory] `asChild` requires exactly one valid React element.',
+          );
+        }
+        if (onlyChild.type === React.Fragment) {
+          throw new Error(
+            '[mystique > factory] `asChild` cannot target a React.Fragment.',
+          );
+        }
+        child = onlyChild;
+        finalTarget = onlyChild.type as React.ElementType;
       }
-      if (!React.isValidElement<AnyProps>(onlyChild)) {
-        throw new Error(
-          '[mystique > factory] `asChild` requires exactly one valid React element.',
-        )
-      }
-      if (onlyChild.type === React.Fragment) {
-        throw new Error(
-          '[mystique > factory] `asChild` cannot target a React.Fragment.',
-        )
-      }
-      child = onlyChild
-      finalTarget = onlyChild.type as React.ElementType
-    }
 
-    const filteredParentProps = filterParentProps(
-      elementProps,
-      finalTarget,
-      system,
-      variantKeys,
-      resolvedFactoryLayers,
-    )
-    const childClassName = child?.props.className as string | undefined
-    let mergedProps = child
-      ? mergeElementProps(
-          filteredParentProps,
-          filterChildProps(child.props, finalTarget),
-        )
-      : { ...filteredParentProps, children }
-    const childRef = child ? getElementRef(child) : undefined
-    Reflect.deleteProperty(mergedProps, 'className')
-
-    const finalProps: AnyProps = { ...mergedProps }
-
-    const refs = [forwardedRef as AnyRef | undefined, childRef].filter(Boolean)
-    if (refs.length === 1) finalProps.ref = refs[0]
-    if (refs.length > 1) finalProps.ref = mergeRefs(...refs)
-    if (child?.key != null) finalProps.key = child.key
-
-    return (
-      <ClassNames>
-        {({ css, cx }) => {
-          const generatedClassName = Object.keys(resolvedStyles).length
-            ? css(resolvedStyles as Parameters<typeof css>[0])
-            : undefined
-          const className = cx(
-            ...(unstyled
-              ? []
-              : cvaRecipes.map((item) => item.className)),
-            inputClassName,
-            childClassName,
-            generatedClassName,
+      const filteredParentProps = filterParentProps(
+        elementProps,
+        finalTarget,
+        system,
+        variantKeys,
+        resolvedFactoryLayers,
+      );
+      const childClassName = child?.props.className as string | undefined;
+      let mergedProps = child
+        ? mergeElementProps(
+            filteredParentProps,
+            filterChildProps(child.props, finalTarget),
           )
-          if (className) finalProps.className = className
-          return React.createElement(finalTarget, finalProps)
-        }}
-      </ClassNames>
-    )
-  })
+        : { ...filteredParentProps, children };
+      const childRef = child ? getElementRef(child) : undefined;
+      Reflect.deleteProperty(mergedProps, 'className');
+
+      const finalProps: AnyProps = { ...mergedProps };
+
+      const refs = [forwardedRef as AnyRef | undefined, childRef].filter(
+        Boolean,
+      );
+      if (refs.length === 1) finalProps.ref = refs[0];
+      if (refs.length > 1) finalProps.ref = mergeRefs(...refs);
+      if (child?.key != null) finalProps.key = child.key;
+
+      return (
+        <ClassNames>
+          {({ css, cx }) => {
+            const generatedClassName = Object.keys(resolvedStyles).length
+              ? css(resolvedStyles as Parameters<typeof css>[0])
+              : undefined;
+            const className = cx(
+              ...(unstyled ? [] : cvaRecipes.map((item) => item.className)),
+              inputClassName,
+              childClassName,
+              generatedClassName,
+            );
+            if (className) finalProps.className = className;
+            return React.createElement(finalTarget, finalProps);
+          }}
+        </ClassNames>
+      );
+    },
+  );
 
   Styled.displayName =
-    options.displayName ?? `mystique(${getDisplayName(baseTarget)})`
+    options.displayName ?? `mystique(${getDisplayName(baseTarget)})`;
   Object.defineProperties(Styled, {
     [FACTORY_METADATA]: { value: factoryMetadata },
     __mystique_base: { value: factoryMetadata.baseTarget },
     __mystique_recipe: { value: recipe },
-  })
-  return Styled
+  });
+  return Styled;
 }
 
-const styledFactory = createStyled.bind(undefined) as unknown as JsxFactory
-const intrinsicCache = new Map<string, unknown>()
+const styledFactory = createStyled.bind(undefined) as unknown as JsxFactory;
+const intrinsicCache = new Map<string, unknown>();
 
 const mystiqueImpl = new Proxy(styledFactory, {
   apply(_target, _thisArg, args: Parameters<typeof createStyled>) {
-    return createStyled(...args)
+    return createStyled(...args);
   },
   get(target, property, receiver) {
     if (typeof property !== 'string' || Reflect.has(target, property)) {
-      return Reflect.get(target, property, receiver)
+      return Reflect.get(target, property, receiver);
     }
-    let component = intrinsicCache.get(property)
+    let component = intrinsicCache.get(property);
     if (!component) {
-      component = createStyled(property as React.ElementType)
-      intrinsicCache.set(property, component)
+      component = createStyled(property as React.ElementType);
+      intrinsicCache.set(property, component);
     }
-    return component
+    return component;
   },
-})
+});
 
-export const mystique = mystiqueImpl as unknown as StyledFactoryFn
+export const mystique = mystiqueImpl as unknown as StyledFactoryFn;

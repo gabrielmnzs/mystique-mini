@@ -1,0 +1,44 @@
+---
+title: Conditions
+description:
+  Style interaction states, color modes, orientations, motion preferences, and
+  custom selectors.
+---
+
+Conditions are named selectors or at-rules. The default preset includes
+interaction aliases, structural selectors, light and dark modes, reduced motion,
+and orientation queries.
+
+```tsx
+import { Box } from 'mystique-mini-react';
+
+export function Action() {
+  return (
+    <Box
+      as="button"
+      bg="blue.600"
+      color="white"
+      _hover={{ bg: 'blue.700' }}
+      _focusVisible={{ outline: '2px solid', outlineColor: 'blue.400' }}
+      _disabled={{ cursor: 'not-allowed', opacity: 0.5 }}
+      _motionReduce={{ transition: 'none' }}
+    >
+      Continue
+    </Box>
+  );
+}
+```
+
+Add a project condition with `defineConfig`.
+
+```ts
+const config = defineConfig({
+  conditions: {
+    _groupHover: '[data-group]:hover &',
+  },
+});
+```
+
+Nested selectors beginning with `&` and raw at-rules beginning with `@` also
+work inside `css`. Named conditions are ordered canonically by the system; raw
+selectors retain authored cascade semantics.

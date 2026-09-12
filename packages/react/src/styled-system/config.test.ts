@@ -1,5 +1,6 @@
-import { describe, expect, it } from 'vitest'
-import { defineConfig, defineGlobalStyles } from './config'
+import { describe, expect, it } from 'vitest';
+
+import { defineConfig, defineGlobalStyles } from './config';
 
 defineGlobalStyles({
   body: {
@@ -7,7 +8,7 @@ defineGlobalStyles({
     // @ts-expect-error global selector declarations reject misspelled properties
     colro: 'red',
   },
-})
+});
 
 defineGlobalStyles({
   body: {
@@ -16,20 +17,20 @@ defineGlobalStyles({
       colro: 'red',
     },
   },
-})
+});
 
 describe('defineConfig', () => {
   it('returns the exact configuration object unchanged', () => {
     const config = {
       cssVarsPrefix: 'mystique',
       theme: { tokens: { colors: { accent: { value: '#b44' } } } },
-    } as const
+    } as const;
 
-    const result = defineConfig(config)
+    const result = defineConfig(config);
 
-    expect(result).toBe(config)
-    expect(result.cssVarsPrefix).toBe('mystique')
-  })
+    expect(result).toBe(config);
+    expect(result.cssVarsPrefix).toBe('mystique');
+  });
 
   it('keeps global selectors and supported at-rules unchanged', () => {
     const styles = {
@@ -50,8 +51,8 @@ describe('defineConfig', () => {
       '@media (prefers-contrast: more)': {
         body: { color: 'black', '& strong': { fontWeight: 700 } },
       },
-    } as const
+    } as const;
 
-    expect(defineGlobalStyles(styles)).toBe(styles)
-  })
-})
+    expect(defineGlobalStyles(styles)).toBe(styles);
+  });
+});

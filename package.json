@@ -12,18 +12,23 @@
     "test": "turbo run test",
     "lint": "eslint .",
     "check-types": "turbo run check-types",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
     "changeset": "changeset",
-    "version-packages": "changeset version"
+    "version-packages": "changeset version",
+    "release": "pnpm build && changeset publish",
+    "validate:package": "pnpm --filter mystique-mini-react build"
   },
   "devDependencies": {
-    "@changesets/cli": "^2.29.8",
+    "@changesets/cli": "^3.0.2",
     "@eslint/js": "^9.39.1",
-    "@types/node": "^24.10.1",
+    "@trivago/prettier-plugin-sort-imports": "^6.0.2",
     "@typescript-eslint/eslint-plugin": "^8.48.0",
     "@typescript-eslint/parser": "^8.48.0",
     "eslint": "^9.39.1",
     "eslint-plugin-react": "^7.37.5",
     "eslint-plugin-react-hooks": "^7.0.1",
+    "prettier": "^3.9.6",
     "turbo": "^2.6.1",
     "typescript": "^5.9.3"
   }
