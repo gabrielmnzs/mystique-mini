@@ -1,3 +1,5 @@
-import { mystique } from '../../system/factory'
+'use client'
 
-export const Box = mystique('div', { themeKey: 'Box' })
+import { mystique } from '../../styled-system/factory'
+
+export const Box = mystique('div', { className: 'mystique-box' })

@@ -1,26 +1,121 @@
 import {
-  Box, Center, Circle, Flex, Span, Square, Text,
-  type CircleProps, type PolymorphicProps, type ResponsiveValue, type SquareProps, type StyleProps,
+  Box,
+  Center,
+  Circle,
+  Flex,
+  MystiqueProvider,
+  Span,
+  Square,
+  Text,
+  cva,
+  createRecipeContext,
+  createSlotRecipeContext,
+  createSystem,
+  defaultConfig,
+  defineConfig,
+  defineGlobalStyles,
+  defineRecipe,
+  mystique,
+  type CircleProps,
+  type ConditionalValue,
+  type CssValue,
+  type RecipeContextProps,
+  type SquareProps,
+  type SlotRecipeTypegenSlots,
+  type SystemStyleObject,
+  type TextProps,
 } from '@gabrielmnzs/mystique-react'
 import { createRef, type ComponentProps, type ComponentRef } from 'react'
 
-const href = <>
+declare module '@gabrielmnzs/mystique-react' {
+  interface MystiqueTypegen {
+    recipeNames: 'button' | 'text'
+    recipes: {
+      button: { tone: 'ghost' | 'solid' }
+      text: { tone: 'body' | 'caption' }
+    }
+    slotRecipeSlots: {
+      badge: 'root' | 'label'
+      field: 'root' | 'label'
+    }
+  }
+}
+
+const customSystem = createSystem(defaultConfig, defineConfig({
+  theme: { tokens: { colors: { brand: { value: '#9f3d2d' } } } },
+}))
+const responsiveSize: ConditionalValue<CssValue> = { base: 1, md: 2 }
+const styles: SystemStyleObject = { p: responsiveSize, color: 'brand' }
+const globalStyles = defineGlobalStyles({
+  body: { color: 'brand', '& strong': { fontWeight: 700 } },
+  '@media (prefers-contrast: more)': { body: { color: 'black' } },
+})
+defineGlobalStyles({
+  body: {
+    // @ts-expect-error built declarations reject misspelled global properties
+    colro: 'red',
+  },
+})
+const Anchor = mystique.a
+const compiledRecipe = cva(defineRecipe({
+  variants: {
+    state: {
+      true: { opacity: 1 },
+      false: { opacity: 0.5 },
+      auto: { opacity: 0.8 },
+    },
+  },
+}))
+const Compiled = mystique('div', compiledRecipe)
+const valid = <MystiqueProvider value={customSystem}>
   <Box as="a" href="/box" ref={createRef<HTMLAnchorElement>()} />
-  <Flex as="a" href="/flex" ref={createRef<HTMLAnchorElement>()} />
-  <Center as="a" href="/center" ref={createRef<HTMLAnchorElement>()} />
-  <Span as="a" href="/span" ref={createRef<HTMLAnchorElement>()} />
-  <Text as="a" href="/text" ref={createRef<HTMLAnchorElement>()} />
-  <Square as="a" href="/square" size={{ base: 2, md: 4 }} ref={createRef<HTMLAnchorElement>()} />
+  <Flex /><Center /><Span /><Text unstyled />
+  <Square size={responsiveSize} />
   <Circle as="a" href="/circle" size="sm" ref={createRef<HTMLAnchorElement>()} />
-</>
-const sizes: ResponsiveValue<number> = { base: 1, md: 2 }
-const styles: StyleProps = { p: sizes }
-const props: PolymorphicProps<'a'> = { href: '/props', color: 'blue.500' }
-const componentProps: ComponentProps<typeof Square> = { size: sizes }
+  <Anchor href="/factory" />
+  <Compiled state={{ base: true, md: 'auto' }} />
+</MystiqueProvider>
+const componentProps: ComponentProps<typeof Square> = { size: 2 }
 const componentRef: ComponentRef<typeof Circle> = document.createElement('div')
-const squareProps: SquareProps = { size: sizes }
+const squareProps: SquareProps = { size: responsiveSize }
 const circleProps: CircleProps = { size: 'sm' }
-void [href, styles, props, componentProps, componentRef, squareProps, circleProps]
+const fieldContext = createSlotRecipeContext({ key: 'field' })
+const FieldRoot = fieldContext.withProvider('div', 'root')
+const FieldLabel = fieldContext.withContext('span', 'label')
+type FieldSlot = SlotRecipeTypegenSlots<'field'>
+const validFieldSlot: FieldSlot = 'label'
+const buttonContext = createRecipeContext({ key: 'button' })
+const RecipeButton = buttonContext.withContext('button')
+const validRecipeButton = <RecipeButton tone={{ base: 'solid', md: 'ghost' }} />
+const validRecipeProps: RecipeContextProps<'button', undefined> = { tone: 'solid' }
+const validRecipeText = <Text tone="body" />
+const validTextProps: TextProps = { tone: { base: 'body', md: 'caption' } }
+const compiledStyles = compiledRecipe({ state: false })
+const [compiledVariants, compiledRest] = compiledRecipe.splitVariantProps({
+  state: 'auto',
+  id: 'compiled',
+} as const)
+const compiledState: 'auto' = compiledVariants.state
+const compiledId: 'compiled' = compiledRest.id
+void [
+  valid,
+  styles,
+  globalStyles,
+  componentProps,
+  componentRef,
+  squareProps,
+  circleProps,
+  FieldRoot,
+  FieldLabel,
+  validFieldSlot,
+  validRecipeButton,
+  validRecipeProps,
+  validRecipeText,
+  validTextProps,
+  compiledStyles,
+  compiledState,
+  compiledId,
+]
 
 // @ts-expect-error href is not valid on the default div target
 const invalidHref = <Box href="/no" />
@@ -29,19 +124,43 @@ const invalidSelectedRef = <Circle as="option" selected ref={document.createElem
 // @ts-expect-error native size is replaced by htmlSize
 const invalidNativeSize = <Box size={4} />
 // @ts-expect-error unknown props are rejected by built declarations
-const invalidUnknownProp = <Text totallyUnknown={true} />
-// @ts-expect-error Square and Circle expose size, but do not accept arbitrary size values
-const invalidSquareSize = <Square size={{ base: { nope: true } }} />
-// @ts-expect-error Square and Circle expose size, but do not accept arbitrary size values
-const invalidCircleSize = <Circle size={{ base: { nope: true } }} />
-void [invalidHref, invalidSelectedRef, invalidNativeSize, invalidUnknownProp, invalidSquareSize, invalidCircleSize]
+const invalidUnknownProp = <Text totallyUnknown />
+// @ts-expect-error keyed slot recipes reject names absent from generated metadata
+const invalidFieldComponent = fieldContext.withProvider('div', 'missing')
+// @ts-expect-error keyed slot contexts reject names absent from generated metadata
+const invalidFieldContextComponent = fieldContext.withContext('span', 'missing')
+// @ts-expect-error generated slot unions reject unknown values
+const invalidFieldSlot: FieldSlot = 'missing'
+// @ts-expect-error generated regular recipe variants reject unknown values
+const invalidRecipeButton = <RecipeButton tone="missing" />
+// @ts-expect-error Text consumes the generated metadata for the text recipe
+const invalidRecipeText = <Text tone="missing" />
+// @ts-expect-error compiled recipe calls reject undeclared selections
+const invalidCompiledCall = compiledRecipe({ state: 'missing' })
+const invalidCompiledSplit = compiledRecipe.splitVariantProps({
+  // @ts-expect-error compiled recipe splitting validates selections too
+  state: 'missing',
+  id: 'invalid',
+})
+// @ts-expect-error compiled recipe components reject boolean string literals
+const invalidCompiledComponent = <Compiled state="true" />
+void [
+  invalidHref,
+  invalidSelectedRef,
+  invalidNativeSize,
+  invalidUnknownProp,
+  invalidFieldComponent,
+  invalidFieldContextComponent,
+  invalidFieldSlot,
+  invalidRecipeButton,
+  invalidRecipeText,
+  invalidCompiledCall,
+  invalidCompiledSplit,
+  invalidCompiledComponent,
+]
 
 type IsAny<T> = 0 extends (1 & T) ? true : false
 type AssertFalse<T extends false> = T
 type _BoxPropsAreNotAny = AssertFalse<IsAny<ComponentProps<typeof Box>>>
 type _BoxRefIsNotAny = AssertFalse<IsAny<ComponentProps<typeof Box>['ref']>>
-type _SquarePropsAreNotAny = AssertFalse<IsAny<ComponentProps<typeof Square>>>
-type _SquareRefIsNotAny = AssertFalse<IsAny<ComponentProps<typeof Square>['ref']>>
-type _CirclePropsAreNotAny = AssertFalse<IsAny<ComponentProps<typeof Circle>>>
-type _CircleRefIsNotAny = AssertFalse<IsAny<ComponentProps<typeof Circle>['ref']>>
-void (null as unknown as [_BoxPropsAreNotAny, _BoxRefIsNotAny, _SquarePropsAreNotAny, _SquareRefIsNotAny, _CirclePropsAreNotAny, _CircleRefIsNotAny])
+void (null as unknown as [_BoxPropsAreNotAny, _BoxRefIsNotAny])

@@ -1,9 +1,9 @@
 import { createSizedComponent } from '../sized-component'
-import type { CSSValue, ResponsiveValue } from '../../system/types'
+import type { ConditionalValue, CssValue } from '../../styled-system/types'
 
-export type SquareProps = { size?: ResponsiveValue<CSSValue> }
+export type SquareProps = { size?: ConditionalValue<CssValue> }
 
 export const Square = createSizedComponent('Square', {
-  themeKey: 'Square',
-  baseStyle: { display: 'flex', align: 'center', justify: 'center' },
+  className: 'mystique-square',
+  base: { display: 'flex', align: 'center', justify: 'center' },
 })

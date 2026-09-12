@@ -1,7 +1,11 @@
 import { defineConfig } from 'tsup'
 
 export default defineConfig({
-  entry: ['src/index.ts'],
+  entry: {
+    preset: 'src/preset.ts',
+    'styled-system': 'src/styled-system/index.ts',
+    typegen: 'src/typegen.ts',
+  },
   format: ['esm', 'cjs'],
   platform: 'neutral',
   dts: true,
@@ -9,6 +13,7 @@ export default defineConfig({
   clean: true,
   external: [
     'react', 'react-dom', 'react/jsx-runtime', 'react/jsx-dev-runtime',
-    '@emotion/react',
+    '@emotion/cache', '@emotion/is-prop-valid', '@emotion/react',
+    'next/navigation',
   ],
 })

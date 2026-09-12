@@ -1,13 +1,20 @@
 {
   "name": "@gabrielmnzs/mystique-react",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Mystique React design system",
   "type": "module",
-  "files": ["dist"],
+  "files": [
+    "dist",
+    "LICENSE",
+    "README.md",
+    "THIRD_PARTY_NOTICES.md"
+  ],
+  "license": "MIT",
   "sideEffects": false,
   "repository": {
     "type": "git",
-    "url": "https://github.com/gabrielmnzs/mystique-mini.git"
+    "url": "https://github.com/gabrielmnzs/mystique-mini.git",
+    "directory": "packages/react"
   },
   "publishConfig": {
     "access": "restricted",
@@ -23,31 +30,84 @@
         "types": "./dist/index.d.cts",
         "default": "./dist/index.cjs"
       }
-    }
+    },
+    "./preset": {
+      "import": {
+        "types": "./dist/preset.d.ts",
+        "default": "./dist/preset.js"
+      },
+      "require": {
+        "types": "./dist/preset.d.cts",
+        "default": "./dist/preset.cjs"
+      }
+    },
+    "./styled-system": {
+      "import": {
+        "types": "./dist/styled-system.d.ts",
+        "default": "./dist/styled-system.js"
+      },
+      "require": {
+        "types": "./dist/styled-system.d.cts",
+        "default": "./dist/styled-system.cjs"
+      }
+    },
+    "./next": {
+      "import": {
+        "types": "./dist/next.d.ts",
+        "default": "./dist/next.js"
+      },
+      "require": {
+        "types": "./dist/next.d.cts",
+        "default": "./dist/next.cjs"
+      }
+    },
+    "./typegen": {
+      "import": {
+        "types": "./dist/typegen.d.ts",
+        "default": "./dist/typegen.js"
+      },
+      "require": {
+        "types": "./dist/typegen.d.cts",
+        "default": "./dist/typegen.cjs"
+      }
+    },
+    "./package.json": "./package.json"
+  },
+  "bin": {
+    "mystique-typegen": "./dist/typegen-cli.js"
   },
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "scripts": {
-    "build": "tsup && pnpm smoke:cjs && pnpm smoke:esm && pnpm smoke:declarations",
+    "build": "pnpm build:dist && pnpm smoke:cjs && pnpm smoke:esm && pnpm smoke:declarations && pnpm smoke:package",
+    "build:dist": "tsup --config tsup.config.ts && tsup --config tsup.client.config.ts && tsup --config tsup.cli.config.ts",
     "smoke:cjs": "node fixtures/built-artifact.cjs",
     "smoke:esm": "node fixtures/built-artifact.mjs",
     "smoke:declarations": "tsc -p tsconfig.build-declarations.json && tsc -p tsconfig.build-declarations.cjs.json",
-    "dev": "tsup --watch",
+    "smoke:package": "node scripts/package-smoke.mjs",
+    "dev": "tsup --config tsup.client.config.ts --watch",
     "test": "vitest run",
     "lint": "eslint src",
     "check-types": "tsc --noEmit"
   },
   "peerDependencies": {
     "@emotion/react": "^11.14.0",
+    "next": ">=15.0.0 <17.0.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0"
   },
+  "peerDependenciesMeta": {
+    "next": {
+      "optional": true
+    }
+  },
   "dependencies": {
-    "@emotion/is-prop-valid": "^1.3.1",
-    "@emotion/styled": "^11.14.0"
+    "@emotion/cache": "^11.14.0",
+    "@emotion/is-prop-valid": "^1.3.1"
   },
   "devDependencies": {
+    "@emotion/cache": "^11.14.0",
     "@emotion/jest": "^11.14.0",
     "@emotion/react": "^11.14.0",
     "@testing-library/jest-dom": "^6.9.1",
@@ -55,6 +115,7 @@
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",
     "jsdom": "^26.1.0",
+    "next": "16.3.4",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "tsup": "^8.5.0",

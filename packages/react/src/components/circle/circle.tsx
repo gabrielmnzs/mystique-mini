@@ -1,9 +1,9 @@
 import { createSizedComponent } from '../sized-component'
-import type { CSSValue, ResponsiveValue } from '../../system/types'
+import type { ConditionalValue, CssValue } from '../../styled-system/types'
 
-export type CircleProps = { size?: ResponsiveValue<CSSValue> }
+export type CircleProps = { size?: ConditionalValue<CssValue> }
 
 export const Circle = createSizedComponent('Circle', {
-  themeKey: 'Circle',
-  baseStyle: { display: 'flex', align: 'center', justify: 'center', rounded: 'full' },
+  className: 'mystique-circle',
+  base: { display: 'flex', align: 'center', justify: 'center', rounded: 'full' },
 })

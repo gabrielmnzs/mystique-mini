@@ -1,3 +1,6 @@
-import { mystique } from '../../system/factory'
+'use client'
 
-export const Span = mystique('span', { themeKey: 'Span', baseStyle: { display: 'inline-block' } })
+import { mystique } from '../../styled-system/factory'
+
+/** A native inline span with no display override. */
+export const Span = mystique('span', { className: 'mystique-span' })

@@ -1,0 +1,29 @@
+{
+  "name": "@gabrielmnzs/mystique-next16-smoke",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "build": "next build --webpack",
+    "check-types": "next typegen && tsc --noEmit --pretty false",
+    "dev": "next dev --webpack -p 3016",
+    "lint": "eslint . --ignore-pattern next-env.d.ts",
+    "start": "next start -p 3016",
+    "test": "next build --webpack && node scripts/runtime-smoke.mjs",
+    "test:runtime": "node scripts/runtime-smoke.mjs"
+  },
+  "dependencies": {
+    "@emotion/cache": "^11.14.0",
+    "@emotion/react": "^11.14.0",
+    "@emotion/server": "^11.11.0",
+    "@gabrielmnzs/mystique-react": "workspace:*",
+    "next": "16.3.4",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^24.10.1",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "typescript": "^5.9.3"
+  }
+}

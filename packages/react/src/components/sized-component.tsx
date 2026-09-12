@@ -1,23 +1,26 @@
-import { forwardRef } from 'react'
-import type { ComponentPropsWithRef, ElementType } from 'react'
-import { mystique, type MystiqueComponent } from '../system/factory'
-import type { RecipeStyleObject } from '../theme'
-import type { CSSValue, ResponsiveValue } from '../system/types'
+'use client'
 
-type SizedProps = { size?: ResponsiveValue<CSSValue> }
+import { forwardRef } from 'react'
+import type { ComponentPropsWithRef, ComponentType, ElementType } from 'react'
+import { mystique } from '../styled-system/factory'
+import type { MystiqueComponent } from '../styled-system/factory.types'
+import type { ConditionalValue, CssValue, RecipeDefinition } from '../styled-system/types'
+
+type SizedProps = { size?: ConditionalValue<CssValue> }
 
 export function createSizedComponent(
   componentName: string,
-  options: { themeKey: string; baseStyle: RecipeStyleObject },
+  recipe: RecipeDefinition,
 ): MystiqueComponent<'div', SizedProps> {
-  const Base = mystique('div', options)
+  const Base = mystique('div', recipe)
+  const BaseImpl = Base as ComponentType<Record<string, unknown>>
   const Component = forwardRef(function SizedComponent(
     inputProps: SizedProps & { as?: ElementType } & Record<string, unknown>,
     ref: ComponentPropsWithRef<'div'>['ref'],
   ) {
     const { size, as, ...props } = inputProps
     const mapped = size === undefined ? props : { ...props, boxSize: size }
-    return as === undefined ? <Base {...mapped} ref={ref} /> : <Base {...mapped} as={as} ref={ref} />
+    return <BaseImpl {...mapped} {...(as === undefined ? {} : { as })} ref={ref} />
   })
 
   Component.displayName = componentName

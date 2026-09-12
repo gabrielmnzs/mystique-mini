@@ -1,3 +1,8 @@
-import { mystique } from '../../system/factory'
+'use client'
 
-export const Flex = mystique('div', { themeKey: 'Flex', baseStyle: { display: 'flex' } })
+import { mystique } from '../../styled-system/factory'
+
+export const Flex = mystique('div', {
+  className: 'mystique-flex',
+  base: { display: 'flex' },
+})
