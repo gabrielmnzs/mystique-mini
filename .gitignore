@@ -1,8 +1,12 @@
 node_modules/
+.pnpm-store/
 dist/
 coverage/
 .turbo/
+.next/
+.playwright-cli/
 *.log
+*.tsbuildinfo
 .DS_Store
 .env
 .env.*

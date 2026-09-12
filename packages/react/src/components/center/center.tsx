@@ -1,3 +1,8 @@
-import { mystique } from '../../system/factory'
+'use client'
 
-export const Center = mystique('div', { themeKey: 'Center', baseStyle: { display: 'flex', align: 'center', justify: 'center' } })
+import { mystique } from '../../styled-system/factory'
+
+export const Center = mystique('div', {
+  className: 'mystique-center',
+  base: { display: 'flex', align: 'center', justify: 'center' },
+})

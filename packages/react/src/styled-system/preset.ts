@@ -1,0 +1,139 @@
+import { defineConfig } from './config'
+import { mergeConfigs } from './merge-config'
+import { defaultBaseConfig } from './preset-base'
+import { createSystem } from './system'
+
+const token = <T extends string | number>(value: T) => ({ value })
+
+export const defaultThemeConfig = defineConfig({
+  globalCss: {
+    body: {
+      bg: 'bg',
+      color: 'fg',
+      fontFamily: 'body',
+    },
+  },
+  theme: {
+    breakpoints: {
+      sm: '30em',
+      md: '48em',
+      lg: '62em',
+      xl: '80em',
+      '2xl': '96em',
+    },
+    tokens: {
+      colors: {
+        transparent: token('transparent'),
+        current: token('currentColor'),
+        black: token('#09090b'),
+        white: token('#ffffff'),
+        gray: {
+          50: token('#fafafa'), 100: token('#f4f4f5'), 200: token('#e4e4e7'),
+          300: token('#d4d4d8'), 400: token('#a1a1aa'), 500: token('#71717a'),
+          600: token('#52525b'), 700: token('#3f3f46'), 800: token('#27272a'),
+          900: token('#18181b'), 950: token('#09090b'),
+        },
+        red: {
+          50: token('#fef2f2'), 100: token('#fee2e2'), 200: token('#fecaca'),
+          300: token('#fca5a5'), 400: token('#f87171'), 500: token('#ef4444'),
+          600: token('#dc2626'), 700: token('#b91c1c'), 800: token('#991b1b'),
+          900: token('#7f1d1d'), 950: token('#450a0a'),
+        },
+        blue: {
+          50: token('#eff6ff'), 100: token('#dbeafe'), 200: token('#bfdbfe'),
+          300: token('#93c5fd'), 400: token('#60a5fa'), 500: token('#3b82f6'),
+          600: token('#2563eb'), 700: token('#1d4ed8'), 800: token('#1e40af'),
+          900: token('#1e3a8a'), 950: token('#172554'),
+        },
+        green: {
+          50: token('#f0fdf4'), 100: token('#dcfce7'), 200: token('#bbf7d0'),
+          300: token('#86efac'), 400: token('#4ade80'), 500: token('#22c55e'),
+          600: token('#16a34a'), 700: token('#15803d'), 800: token('#166534'),
+          900: token('#14532d'), 950: token('#052e16'),
+        },
+        purple: {
+          50: token('#faf5ff'), 100: token('#f3e8ff'), 200: token('#e9d5ff'),
+          300: token('#d8b4fe'), 400: token('#c084fc'), 500: token('#a855f7'),
+          600: token('#9333ea'), 700: token('#7e22ce'), 800: token('#6b21a8'),
+          900: token('#581c87'), 950: token('#3b0764'),
+        },
+        yellow: {
+          50: token('#fefce8'), 100: token('#fef9c3'), 200: token('#fef08a'),
+          300: token('#fde047'), 400: token('#facc15'), 500: token('#eab308'),
+          600: token('#ca8a04'), 700: token('#a16207'), 800: token('#854d0e'),
+          900: token('#713f12'), 950: token('#422006'),
+        },
+      },
+      spacing: {
+        0: token('0rem'), 0.5: token('0.125rem'), 1: token('0.25rem'),
+        1.5: token('0.375rem'), 2: token('0.5rem'), 2.5: token('0.625rem'),
+        3: token('0.75rem'), 3.5: token('0.875rem'), 4: token('1rem'),
+        5: token('1.25rem'), 6: token('1.5rem'), 8: token('2rem'),
+        10: token('2.5rem'), 12: token('3rem'), 16: token('4rem'),
+        20: token('5rem'), 24: token('6rem'), 32: token('8rem'),
+      },
+      sizes: {
+        xs: token('20rem'), sm: token('24rem'), md: token('28rem'),
+        lg: token('32rem'), xl: token('36rem'), '2xl': token('42rem'),
+        full: token('100%'), min: token('min-content'), max: token('max-content'),
+        fit: token('fit-content'), screen: token('100vw'), dvh: token('100dvh'),
+      },
+      fontSizes: {
+        xs: token('0.75rem'), sm: token('0.875rem'), md: token('1rem'),
+        lg: token('1.125rem'), xl: token('1.25rem'), '2xl': token('1.5rem'),
+        '3xl': token('1.875rem'), '4xl': token('2.25rem'),
+      },
+      fontWeights: {
+        normal: token(400), medium: token(500), semibold: token(600), bold: token(700),
+      },
+      lineHeights: {
+        normal: token('normal'), none: token(1), tight: token(1.25),
+        snug: token(1.375), base: token(1.5), relaxed: token(1.625), loose: token(2),
+      },
+      letterSpacings: {
+        tighter: token('-0.05em'), tight: token('-0.025em'), normal: token('0'),
+        wide: token('0.025em'), wider: token('0.05em'),
+      },
+      fonts: {
+        body: token('system-ui, sans-serif'), heading: token('system-ui, sans-serif'),
+        mono: token('ui-monospace, SFMono-Regular, Menlo, monospace'),
+      },
+      radii: {
+        none: token('0'), xs: token('0.0625rem'), sm: token('0.125rem'),
+        md: token('0.375rem'), lg: token('0.5rem'), xl: token('0.75rem'),
+        full: token('9999px'),
+      },
+      borders: { none: token('0'), thin: token('1px solid') },
+      borderWidths: { 0: token('0'), 1: token('1px'), 2: token('2px'), 4: token('4px') },
+      shadows: {
+        xs: token('0 1px 2px rgb(0 0 0 / 0.05)'),
+        sm: token('0 1px 3px rgb(0 0 0 / 0.1)'),
+        md: token('0 4px 6px -1px rgb(0 0 0 / 0.1)'),
+      },
+      zIndex: {
+        hide: token(-1), base: token(0), dropdown: token(1000),
+        sticky: token(1100), overlay: token(1300), modal: token(1400),
+        popover: token(1500), toast: token(1700), tooltip: token(1800),
+      },
+      aspectRatios: { square: token('1 / 1'), portrait: token('3 / 4'), landscape: token('4 / 3') },
+    },
+    semanticTokens: {
+      colors: {
+        bg: { value: { base: '{colors.white}', _dark: '{colors.gray.950}' } },
+        fg: { value: { base: '{colors.gray.900}', _dark: '{colors.gray.50}' } },
+        muted: { value: { base: '{colors.gray.600}', _dark: '{colors.gray.400}' } },
+        accent: { value: { base: '{colors.purple.600}', _dark: '{colors.purple.300}' } },
+      },
+    },
+    recipes: {
+      text: {
+        className: 'mystique-text',
+        base: { margin: 0 },
+      },
+    },
+  },
+})
+
+export const defaultConfig = mergeConfigs(defaultBaseConfig, defaultThemeConfig)
+export const defaultSystem = createSystem(defaultConfig)
+export const system = defaultSystem

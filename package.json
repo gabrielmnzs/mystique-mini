@@ -11,9 +11,12 @@
     "build": "turbo run build",
     "test": "turbo run test",
     "lint": "eslint .",
-    "check-types": "turbo run check-types"
+    "check-types": "turbo run check-types",
+    "changeset": "changeset",
+    "version-packages": "changeset version"
   },
   "devDependencies": {
+    "@changesets/cli": "^2.29.8",
     "@eslint/js": "^9.39.1",
     "@types/node": "^24.10.1",
     "@typescript-eslint/eslint-plugin": "^8.48.0",

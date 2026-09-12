@@ -1,7 +1,7 @@
 import { cleanup, fireEvent, render, screen } from '@testing-library/react'
 import { StrictMode } from 'react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { App } from './main'
+import { App, sandboxSystem } from './main'
 
 const installButton = () => screen.getByRole('button', { name: /copy install command|copied to clipboard/i })
 
@@ -103,10 +103,36 @@ describe('install command clipboard feedback', () => {
     await vi.waitFor(() => expect(screen.getByRole('status')).toHaveTextContent(/copied/i))
   })
 
-  it('scrolls to and focuses Setup from the polymorphic button', () => {
+  it('injects the API 0.2 system, renders all seven components, and preserves polymorphic focus', () => {
     const scrollIntoView = vi.fn()
     Object.defineProperty(HTMLElement.prototype, 'scrollIntoView', { configurable: true, value: scrollIntoView })
     render(<App />)
+
+    expect(sandboxSystem.$$mystique).toBe(true)
+    expect(sandboxSystem.token('colors.accent')).toBe('var(--mystique-colors-accent)')
+    expect(sandboxSystem.tokens.cssVars.get('base')?.get('--mystique-colors-accent')).toBe(
+      'var(--mystique-colors-coral)',
+    )
+    expect(sandboxSystem.getRecipe('specimen')?.defaultVariants).toEqual({
+      size: 'lg',
+      variant: 'quiet',
+    })
+    expect(sandboxSystem.css({
+      direction: { base: 'column', md: 'row' },
+      _hover: { color: 'accent' },
+    })).toEqual({
+      flexDirection: 'column',
+      '@media screen and (min-width: 48rem)': { flexDirection: 'row' },
+      '&:is(:hover, [data-hover]):not(:disabled, [data-disabled])': {
+        color: 'var(--mystique-colors-accent)',
+      },
+    })
+
+    for (const component of ['box', 'flex', 'center', 'square', 'circle', 'span', 'text']) {
+      expect(document.querySelector(`.mystique-${component}`)).not.toBeNull()
+    }
+    expect(screen.getByText('variant: quiet · size: lg')).toBeInTheDocument()
+    expect(screen.getByText(/provider contract:/i)).toHaveTextContent('value={system}')
 
     fireEvent.click(screen.getByRole('button', { name: /as button.*setup/i }))
 
